@@ -7,7 +7,9 @@ import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_catego
 class CategoryCard extends StatelessWidget {
   final String? imgUrl;
   final String? title;
-  const CategoryCard({super.key, this.imgUrl, this.title});
+  final bool isSubCategory;
+  const CategoryCard(
+      {super.key, this.imgUrl, this.title, this.isSubCategory = false});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +17,9 @@ class CategoryCard extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: InkWell(
         onTap: () {
-          NavigationService.goNext(context, SubCategoriesView.routeName);
+          if (!isSubCategory) {
+            NavigationService.goNext(context, SubCategoriesView.routeName);
+          }
         },
         child: Column(
           children: [

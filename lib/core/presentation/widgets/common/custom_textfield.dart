@@ -20,7 +20,7 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final TextInputType? textInputType;
   final TextInputAction? textInputAction;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final TextCapitalization? capitalization;
   final int? maxLength;
   final List<TextInputFormatter>? textInputFormatter;
@@ -42,6 +42,7 @@ class CustomTextField extends StatefulWidget {
   final Border? border;
   final TextAlign? textAlign;
   final TextAlignVertical? textAlignVertical;
+  final bool autofocus;
   final void Function(String)? onFieldSubmitted;
   // String? Function(String?)? validator;
 
@@ -53,8 +54,9 @@ class CustomTextField extends StatefulWidget {
       this.isReadOnly,
       this.labelText,
       this.hintText,
-      required this.controller,
+      this.controller,
       this.isRequired = false,
+      this. autofocus = false,
       this.textInputAction,
       this.prefix,
       this.fillColor,
@@ -67,7 +69,7 @@ class CustomTextField extends StatefulWidget {
       this.textInputType,
       this.onPress,
       this.isEnable,
-       this.label,
+      this.label,
       this.capitalization,
       this.maxLength,
       this.textInputFormatter,
@@ -105,7 +107,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         print('default text - ${widget.defaultValue}');
       }
       Future.delayed(const Duration(microseconds: 100), () {
-        widget.controller.text = widget.defaultValue!;
+        widget.controller?.text = widget.defaultValue!;
       });
     }
   }
@@ -148,9 +150,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     : Container()
               ],
             ),
-          const SizedBox(height: 7),
+          if (widget.label != null) const SizedBox(height: 7),
           TextFormField(
-            
+            autofocus: widget.autofocus,
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSecondary,
                 fontSize: 16,
@@ -215,11 +217,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       : Theme.of(context).colorScheme.onSecondary,
                 ),
                 hintText: widget.hintText,
+                hintStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.surfaceBright),
                 counterText: widget.counterText,
                 prefix: widget.prefix,
                 suffix: widget.suffix,
                 suffixIcon: widget.suffixIcon,
                 prefixIcon: widget.prefixIcon,
+                disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(widget.borderRadius ?? 7.0)),
+                    borderSide: BorderSide(
+                        color: widget.focusedColor ??
+                            Theme.of(context).colorScheme.onSecondary)),
                 focusedBorder: widget.inputBorder ??
                     OutlineInputBorder(
                         borderRadius: BorderRadius.all(
@@ -235,7 +245,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                           color: _validationError
                               ? Theme.of(context).colorScheme.error
                               : widget.enabledBorder ??
-                                  Theme.of(context).colorScheme.onPrimary),
+                                  Theme.of(context).colorScheme.surfaceBright),
                     ),
                 border: widget.inputBorder ??
                     OutlineInputBorder(

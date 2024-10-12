@@ -5,7 +5,6 @@ import 'package:nomo_app/features/categories/presentation/widgets/category_card.
 import 'package:nomo_app/features/product/presentation/widgets/product_card.widget.dart';
 
 class SubCategoriesView extends StatefulWidget {
-
   static String routeName = "/sub_categories_view";
   const SubCategoriesView({super.key});
 
@@ -37,6 +36,7 @@ class _SubCategoriesViewState extends State<SubCategoriesView> {
                   return CategoryCard(
                     imgUrl: "apple".svg,
                     title: "Apple\nmango",
+                    isSubCategory: true,
                   );
                 },
                 itemCount: 8,

@@ -4,6 +4,8 @@ import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/cart/presentation/view/cart.view.dart';
 import 'package:nomo_app/features/product/product_details/presentation/widgets/product_options_bottom_sheet.widget.dart';
 
 class ProductDetailsView extends StatelessWidget {
@@ -56,6 +58,9 @@ class ProductDetailsView extends StatelessWidget {
                   textValue: CustomText("Go to Cart")
                       .lm()
                       .textColor(Theme.of(context).colorScheme.onPrimary),
+                  onPress: () {
+                    NavigationService.goNext(context, CartView.routeName);
+                  },
                 )
               ],
             ),

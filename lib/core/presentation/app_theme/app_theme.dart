@@ -129,6 +129,7 @@ class AppTheme {
           brightness: Brightness.light,
           onBackground: HexColor(appThemesColors.onBackground),
           surface: HexColor(appThemesColors.surface),
+          surfaceBright: HexColor(appThemesColors.surfaceBright),
           onSurface: HexColor(appThemesColors.onSurface),
           outline: HexColor(appThemesColors.outline),
           tertiary: HexColor(appThemesColors.tertiary)),

@@ -1,13 +1,18 @@
+
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
 import 'package:nomo_app/features/product/presentation/widgets/product_card.widget.dart';
 
 class HomeView extends StatelessWidget {
-  HomeView({super.key});
+  final Function()? onProfileTap;
+  final Function()? onCategoriesTap;
+  HomeView({super.key, this.onProfileTap, this.onCategoriesTap});
   final TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -39,27 +44,36 @@ class HomeView extends StatelessWidget {
                               CustomText("Delivery in just 10 Mins")
                                   .db()
                                   .bold(),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_pin,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  CustomText(" Kalyan, Thane - Mum").ds(),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                    size: 20,
-                                  ),
-                                ],
+                              InkWell(
+                                onTap: () {
+                                  NavigationService.goNext(
+                                      context, AddressListView.routeName);
+                                },
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_pin,
+                                    ),
+                                    CustomText(" Kalyan, Thane - Mum").ds(),
+                                    Icon(
+                                      Icons.keyboard_arrow_down,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      size: 20,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                          const CircleAvatar(
-                            child: Icon(Icons.person),
+                          InkWell(
+                            onTap: () {
+                              onProfileTap?.call();
+                            },
+                            child: const CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
                           )
                         ],
                       ),
@@ -73,7 +87,10 @@ class HomeView extends StatelessWidget {
                         isRequired: false,
                         isEnable: true,
                         textInputType: TextInputType.text,
-                        prefixIcon: Icon(Icons.search),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Theme.of(context).primaryColor,
+                        ),
                         filled: true,
                         fillColor: Theme.of(context).colorScheme.surface,
                         borderRadius: 24,
@@ -124,7 +141,10 @@ class HomeView extends StatelessWidget {
                 children: [
                   CustomText("Categories 😋").db().bold(),
                   TextButton(
-                      onPressed: () {}, child: CustomText("See all").db()),
+                      onPressed: () {
+                        onCategoriesTap?.call();
+                      },
+                      child: CustomText("See all").db()),
                 ],
               ),
             ),
@@ -179,7 +199,7 @@ class HomeView extends StatelessWidget {
           ),
 
           const SliverPadding(
-            padding: EdgeInsets.symmetric(vertical: kToolbarHeight-10),
+            padding: EdgeInsets.symmetric(vertical: kToolbarHeight - 10),
           ),
         ],
       ),

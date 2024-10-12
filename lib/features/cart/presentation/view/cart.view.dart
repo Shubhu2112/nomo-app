@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/widgets/common/custom_bottom_appbar.dart';
+import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/core/presentation/widgets/common/shared_ui.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_item.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/gradient_offer_card.widget.dart';
+import 'package:nomo_app/features/order/presentation/views/order_status.view.dart';
+import 'package:nomo_app/features/order/presentation/widgets/order_success.widget.dart';
 import 'package:nomo_app/features/product/product_details/presentation/widgets/product_option_card.widget.dart';
 import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_categories.view.dart';
 
@@ -14,63 +21,66 @@ class CartView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 8,
-        toolbarHeight: 70,
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
-        surfaceTintColor: Theme.of(context).colorScheme.onPrimary,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20.0),
-            bottomRight: Radius.circular(20.0),
-          ),
+      
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: CustomPrimaryButton(
+          width: double.infinity,
+          textValue: CustomText("Click to Pay (₹120)  >")
+              .lb()
+              .textColor(Theme.of(context).colorScheme.surface),
+          onPress: () {
+            SharedUi.showCustomDialog(context,
+                child: const OrderSuccessWidget());
+            Future.delayed(
+              const Duration(milliseconds: 1400),
+              () {
+                if (context.mounted) {
+                  NavigationService.goNext(context, OrderStatusView.routeName);
+                }
+              },
+            );
+          },
         ),
-        title: CustomText("Your Cart").db().bold(),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: Column(
+      ),
+      appBar: CustomBottomAppbar(
+        title: "Your Cart",
+        
+        bottomWidget: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 2),
+          child: Row(
             children: [
-              const Divider(
-                thickness: 2,
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 6),
-                child: Row(
+              const Icon(Icons.near_me, size: 36),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.near_me, size: 36),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CustomText("Ordering for Sagar").db().bold(),
-                          InkWell(
-                            onTap: () {},
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: CustomText(
-                                      "B-003, Blue pearl CHS, Malad west - 400064",
-                                    )
-                                        .lm()
-                                        .overflow(TextOverflow.ellipsis)
-                                        .maxLines(1),
-                                  ),
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                  ),
-                                ],
-                              ),
+                    CustomText("Ordering for Sagar").db().bold(),
+                    InkWell(
+                      onTap: () {
+                        NavigationService.goNext(
+                            context, AddressListView.routeName);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(1.6),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CustomText(
+                                "B-003, Blue pearl CHS, Malad west - 400064",
+                              )
+                                  .lm()
+                                  .overflow(TextOverflow.ellipsis)
+                                  .maxLines(1),
                             ),
-                          ),
-                        ],
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Theme.of(context).colorScheme.onSecondary,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -112,7 +122,7 @@ class CartView extends StatelessWidget {
                           ],
                         ),
                       ),
-                            
+
                       // ListView or equivalent for product cards
                       ListView.builder(
                         padding: EdgeInsets.zero,
@@ -129,7 +139,9 @@ class CartView extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 6,),
+              const SizedBox(
+                height: 6,
+              ),
               InkWell(
                 onTap: () {},
                 child: Card(
@@ -147,7 +159,9 @@ class CartView extends StatelessWidget {
                   ),
                 ),
               ),
-               const SizedBox(height: 6,),
+              const SizedBox(
+                height: 6,
+              ),
               CustomText("Bill Summary").db().bold(),
               Card(
                 color: Theme.of(context).primaryColor.withOpacity(0.33),
@@ -165,8 +179,12 @@ class CartView extends StatelessWidget {
                   ]),
                 ),
               ),
-               const SizedBox(height: 6,),
-              CustomText("Review your order to avoid cancellations").dm().bold(),
+              const SizedBox(
+                height: 6,
+              ),
+              CustomText("Review your order to avoid cancellations")
+                  .dm()
+                  .bold(),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -184,7 +202,8 @@ class CartView extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: kToolbarHeight+50), // Add space at the bottom
+              const SizedBox(
+                  height: kToolbarHeight + 50), // Add space at the bottom
             ],
           ),
         ),

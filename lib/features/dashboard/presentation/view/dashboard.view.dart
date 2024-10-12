@@ -6,11 +6,13 @@ import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/features/cart/presentation/view/cart.view.dart';
 import 'package:nomo_app/features/categories/presentation/view/categories.view.dart';
 import 'package:nomo_app/features/dashboard/presentation/view/home.view.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
 import 'package:nomo_app/features/product/presentation/widgets/product_card.widget.dart';
+import 'package:nomo_app/features/profile/presentation/view/profile.view.dart';
 import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_categories.view.dart';
 // import 'package:responsive_navigation_bar/responsive_navigation_bar.dart';
 
@@ -27,25 +29,41 @@ class _DashboardViewState extends State<DashboardView> {
 
   void changeTab(int index) {
     setState(() {
-      _currentPage = index;
+      if (index == 2) {
+        NavigationService.goNext(context, CartView.routeName).then(
+          (value) {
+            setState(() {
+              _currentPage = 0;
+            });
+          },
+        );
+      } else {
+        _currentPage = index;
+      }
     });
   }
 
-  @override
-  void initState() {
-    print("home page");
-    super.initState();
-  }
+   List<Widget> _pages=[];
 
-  final List<Widget> _pages = [
-    HomeView(),
+@override
+void initState() {
+  super.initState();
+
+  // Initialize _pages here after the state is fully initialized
+  _pages = [
+    HomeView(
+      onProfileTap: () {
+        changeTab(3);
+      },
+      onCategoriesTap: () {
+         changeTab(1);
+      },
+    ),
     const CategoriesView(),
-    const CartView(),
-    Container(),
-    // GridPage(),
-    // CartPage(),
-    // ProfilePage(),
+    const Offstage(),
+    const ProfileView(),
   ];
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -18,6 +18,7 @@ class AppThemeDataModel {
       required this.brightness,
       required this.onBackground,
       required this.surface,
+      required this.surfaceBright,
       required this.onSurface,
       required this.primarySwatch,
       required this.appBar,
@@ -38,6 +39,7 @@ class AppThemeDataModel {
   String brightness;
   String onBackground;
   String surface;
+  String surfaceBright;
   String onSurface;
   String primarySwatch;
   String outline;
@@ -60,6 +62,7 @@ class AppThemeDataModel {
           brightness: json["brightness"],
           onBackground: json["onBackground"],
           surface: json["surface"],
+          surfaceBright: json["surfaceBright"],
           onSurface: json["onSurface"],
           outline: json["outline"],
           primarySwatch: json["primarySwatch"],
@@ -84,6 +87,7 @@ class AppThemeDataModel {
         "onBackground": onBackground,
         "surface": surface,
         "onSurface": onSurface,
+        "surfaceBright": surfaceBright,
         "primarySwatch": primarySwatch,
         "outline": outline,
         "tertiary": tertiary,

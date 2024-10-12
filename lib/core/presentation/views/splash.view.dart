@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
 import 'package:nomo_app/features/dashboard/presentation/view/dashboard.view.dart';
 
 class SplashView extends StatefulWidget {
@@ -64,7 +65,7 @@ class _SplashViewState extends State<SplashView>
     Future.delayed(const Duration(seconds: 2), () {
       // You can navigate to the next screen here
       if (mounted) {
-        NavigationService.goNextFinishAll(context, DashboardView.routeName);
+        NavigationService.goNextFinishAll(context, OtpView.routeName);
       }
     });
   }

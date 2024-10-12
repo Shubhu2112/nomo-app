@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:nomo_app/features/address/presentation/view/add_address.view.dart';
+import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
+import 'package:nomo_app/features/address/presentation/widgets/add_address_bottomsheet.widget.dart';
+import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
 import 'package:nomo_app/features/cart/presentation/view/cart.view.dart';
 import 'package:nomo_app/features/dashboard/presentation/view/dashboard.view.dart';
+import 'package:nomo_app/features/order/presentation/views/order_status.view.dart';
+import 'package:nomo_app/features/order/presentation/widgets/order_success.widget.dart';
+import 'package:nomo_app/features/order/presentation/views/order_summary.view.dart';
+import 'package:nomo_app/features/order/presentation/views/orders_list.view.dart';
 import 'package:nomo_app/features/product/product_details/presentation/view/product_details.view.dart';
 import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_categories.view.dart';
 
@@ -15,10 +23,16 @@ class NavigationService {
 
   static Map<String, Widget Function(BuildContext context)> generateRoute() {
     return {
+      OtpView.routeName: (context) =>  OtpView(),
       DashboardView.routeName: (context) => const DashboardView(),
       ProductDetailsView.routeName: (context) => const ProductDetailsView(),
       SubCategoriesView.routeName: (context) => const SubCategoriesView(),
-      CartView.routeName: (context) => const CartView()
+      CartView.routeName: (context) => const CartView(),
+      OrdersListView.routeName: (context) => const OrdersListView(),
+      OrderSummaryView.routeName: (context) => const OrderSummaryView(),
+      AddressListView.routeName: (context) => const AddressListView(),
+      AddAddressView.routeName: (context) => const AddAddressView(),
+      OrderStatusView.routeName: (context) => const OrderStatusView()
       // VideoListView.routeName: (context) => const VideoListView(),
       // HlsVideoPlayerView.routeName: (context) => const HlsVideoPlayerView()
     };

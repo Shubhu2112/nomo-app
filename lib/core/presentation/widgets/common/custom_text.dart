@@ -169,7 +169,7 @@ extension TextExtension on CustomText {
     return this;
   }
 
-   CustomText overflow(TextOverflow textOverflow) {
+  CustomText overflow(TextOverflow textOverflow) {
     _overflow = textOverflow;
     return this;
   }
@@ -186,8 +186,10 @@ extension TextExtension on CustomText {
     return this;
   }
 
-  CustomText bold() {
-    _textStyle = _textStyle.copyWith(fontWeight: FontWeight.bold);
+  CustomText bold({bool returnBold = true}) {
+    if (returnBold) {
+      _textStyle = _textStyle.copyWith(fontWeight: FontWeight.bold);
+    }
 
     return this;
   }
@@ -239,8 +241,8 @@ extension TextExtension on CustomText {
     return this;
   }
 
-  CustomText whl() {
-    //white heading large
+  CustomText dlt() {
+     //dark large title
     _textStyle = _textStyle.copyWith(
         fontSize: _textThemeStyle.titleLarge.fontSize.toDouble(),
         color: getColorFromHex(_textThemeStyle.titleLarge.color),
@@ -249,8 +251,8 @@ extension TextExtension on CustomText {
     return this;
   }
 
-  CustomText wml() {
-    //white medium large
+  CustomText dmt() {
+    //dark medium title
     _textStyle = _textStyle.copyWith(
       fontSize: _textThemeStyle.titleMedium.fontSize.toDouble(),
       color: getColorFromHex(_textThemeStyle.titleMedium.color),

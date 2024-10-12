@@ -5,8 +5,10 @@ extension AssetsExtension on String {
   ///we just need to add image name with .png extension
   get png =>
       "assets/tenants/${FlavorConfig.instance!.productName}/images/$this.png";
-      get iconPng =>
+  get iconPng =>
       "assets/tenants/${FlavorConfig.instance!.productName}/icons/$this.png";
   get svg =>
       "assets/tenants/${FlavorConfig.instance!.productName}/images/$this.svg";
+  get anm =>
+      "assets/tenants/${FlavorConfig.instance!.productName}/animations/$this.json";
 }

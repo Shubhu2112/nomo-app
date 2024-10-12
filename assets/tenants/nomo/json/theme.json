@@ -10,6 +10,7 @@
   "onBackground": "#F6F6F6",
   "surface": "#FFFFFF",
   "onSurface": "#E7EAED",
+  "surfaceBright": "#7C7C7C",
   "primarySwatch": "#DAE9FF",
   "outline": "#E3E1E1",
   "tertiary": "#29292999",
@@ -51,19 +52,19 @@
       "color": "#000000"
     },
     "labelLarge": {
-      "fontFamily": "RobotoCondensed",
+      "fontFamily": "DMSans",
       "fontSize": 20,
       "color": "#141B2F",
       "fontWeight": "500"
     },
     "labelMedium": {
-      "fontFamily": "RobotoCondensed",
+      "fontFamily": "DMSans",
       "fontSize": 16,
       "color": "#141B2F",
       "fontWeight": "400"
     },
     "labelSmall": {
-      "fontFamily": "RobotoCondensed",
+      "fontFamily": "DMSans",
       "fontSize": 14,
       "color": "#141B2F",
       "fontWeight": "400"
@@ -127,16 +128,16 @@
       "color": "#001317"
     },
     "titleLarge": {
-      "fontFamily": "Mulish",
-      "fontSize": 26,
-      "color": "#3F7ED3",
-      "letterSpacing": 1.0,
+      "fontFamily": "Roboto",
+      "fontSize": 82,
+      "color": "#001317",
+      "letterSpacing": 0.0,
       "fontWeight": "700"
     },
     "titleMedium": {
-      "fontFamily": "Mulish",
-      "fontSize": 22,
-      "color": "#141B2F",
+      "fontFamily": "Roboto",
+      "fontSize": 41,
+      "color": "#001317",
       "letterSpacing": 1.0,
       "fontWeight": "700"
     }
