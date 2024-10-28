@@ -2,18 +2,22 @@
 // import 'package:dot_curved_bottom_nav/dot_curved_bottom_nav.dart';
 // import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
+import 'package:nomo_app/features/authentication/data/models/user.model.dart';
 import 'package:nomo_app/features/cart/presentation/view/cart.view.dart';
 import 'package:nomo_app/features/categories/presentation/view/categories.view.dart';
+import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
 import 'package:nomo_app/features/dashboard/presentation/view/home.view.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
-import 'package:nomo_app/features/product/presentation/widgets/product_card.widget.dart';
+import 'package:nomo_app/features/product/product_list/presentation/widgets/product_card.widget.dart';
 import 'package:nomo_app/features/profile/presentation/view/profile.view.dart';
-import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_categories.view.dart';
+import 'package:nomo_app/features/sub_categories/presentation/view/sub_categories.view.dart';
 // import 'package:responsive_navigation_bar/responsive_navigation_bar.dart';
 
 class DashboardView extends StatefulWidget {
@@ -43,29 +47,34 @@ class _DashboardViewState extends State<DashboardView> {
     });
   }
 
-   List<Widget> _pages=[];
+  List<Widget> _pages = [];
 
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
+    context.read<AddressListCubit>();
+    // Initialize _pages here after the state is fully initialized
+    _pages = [
+      HomeView(
+        onProfileTap: () {
+          changeTab(3);
+        },
+        onCategoriesTap: () {
+          changeTab(1);
+        },
+      ),
+      const CategoriesView(),
+      const Offstage(),
+      const ProfileView(),
+    ];
+  }
 
-  // Initialize _pages here after the state is fully initialized
-  _pages = [
-    HomeView(
-      onProfileTap: () {
-        changeTab(3);
-      },
-      onCategoriesTap: () {
-         changeTab(1);
-      },
-    ),
-    const CategoriesView(),
-    const Offstage(),
-    const ProfileView(),
-  ];
-}
   @override
   Widget build(BuildContext context) {
+    if (ModalRoute.of(context)!.settings.arguments != null) {
+      final args = ModalRoute.of(context)!.settings.arguments as UserModel;
+      context.read<HomeCubit>().userModel = args;
+    }
     return Scaffold(
         extendBodyBehindAppBar: true,
         extendBody: true,

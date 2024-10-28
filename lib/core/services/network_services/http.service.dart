@@ -1,4 +1,5 @@
 
+import 'package:nomo_app/core/common/parser/query_helper.dart';
 import 'package:nomo_app/core/data/enums/api_type.enum.dart';
 import 'package:nomo_app/core/services/network_services/dio_http_impl.service.dart';
 
@@ -7,6 +8,7 @@ abstract class HttpService {
     String endPoint, {
     bool isPublic = true,
     Map<String, dynamic> queryParameters = const {},
+    Params? params,
     ApiType? type,
     Function({required String message})? onError,
   });
@@ -15,6 +17,7 @@ abstract class HttpService {
     String endPoint, {
     bool isPublic = true,
     Map<String, dynamic> queryParameters = const {},
+    Params? params,
     ApiType? type,
     Function({required String message})? onError,
   });

@@ -11,6 +11,7 @@ class CustomPrimaryButton extends StatelessWidget {
   final double? fontSize;
   final bool isExpanded;
   final BorderSide? borderSide;
+  final EdgeInsetsGeometry padding;
 
   const CustomPrimaryButton(
       {super.key,
@@ -23,12 +24,13 @@ class CustomPrimaryButton extends StatelessWidget {
       this.fontSize,
       this.radius,
       this.isExpanded = false,
+      this.padding = const EdgeInsets.symmetric(horizontal: 10,vertical: 7),
       this.borderSide});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 7),
+      padding: padding,
       child: SizedBox(
           height: height ?? 40,
           width: isExpanded ? double.infinity : (width ?? 110),

@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,6 +46,7 @@ class CustomTextField extends StatefulWidget {
   final TextAlignVertical? textAlignVertical;
   final bool autofocus;
   final void Function(String)? onFieldSubmitted;
+  final void Function(String value)? onSave;
   // String? Function(String?)? validator;
 
   const CustomTextField(
@@ -56,7 +59,7 @@ class CustomTextField extends StatefulWidget {
       this.hintText,
       this.controller,
       this.isRequired = false,
-      this. autofocus = false,
+      this.autofocus = false,
       this.textInputAction,
       this.prefix,
       this.fillColor,
@@ -87,6 +90,7 @@ class CustomTextField extends StatefulWidget {
       this.textAlign,
       this.textAlignVertical,
       this.onFieldSubmitted,
+      this.onSave,
       this.suffix});
 
   @override
@@ -199,6 +203,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
             //initialValue: widget.value ?? "",
             readOnly: widget.isReadOnly != null ? widget.isReadOnly! : false,
             onTap: widget.onPress,
+            onSaved: (newValue) {
+              widget.onSave?.call(newValue ?? "");
+            },
             maxLines: widget.maxLines ?? 1,
             keyboardType: widget.textInputType ?? TextInputType.text,
             textInputAction: widget.textInputAction ?? TextInputAction.done,

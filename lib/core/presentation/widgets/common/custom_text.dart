@@ -6,9 +6,9 @@ import 'package:nomo_app/core/services/flavor_services/flavor_config.dart';
 // ignore: must_be_immutable
 class CustomText extends StatelessWidget {
   final String text;
-  final bool showSymbol;
+  final bool showCurrencySymbol;
 
-  CustomText(this.text, {super.key, this.showSymbol = false});
+  CustomText(this.text, {super.key, this.showCurrencySymbol = false});
   TextStyle _textStyle = const TextStyle();
   final TextThemeStyle _textThemeStyle =
       AppThemeDataModel.fromJson(FlavorConfig.instance!.theme).textThemeStyle;
@@ -20,7 +20,7 @@ class CustomText extends StatelessWidget {
   int? _maxLines;
   @override
   Widget build(BuildContext context) {
-    return showSymbol
+    return showCurrencySymbol
         ? Text(
             "₹$text",
             style: _textStyle,
@@ -68,6 +68,11 @@ extension TextExtension on CustomText {
         fontSize: _textThemeStyle.bodyMedium.fontSize.toDouble(),
         color: getColorFromHex(_textThemeStyle.bodyMedium.color),
         fontFamily: _textThemeStyle.bodyMedium.fontFamily);
+    return this;
+  }
+  CustomText height(double? height) {
+    _textStyle = _textStyle.copyWith(
+       height: height);
     return this;
   }
 
@@ -163,9 +168,9 @@ extension TextExtension on CustomText {
     return this;
   }
 
-  CustomText decoration(TextDecoration decoration) {
+  CustomText decoration(TextDecoration decoration,{Color? color}) {
     _textStyle =
-        _textStyle.copyWith(decoration: decoration, decorationThickness: 2.2);
+        _textStyle.copyWith(decoration: decoration, decorationThickness: 2.2,decorationColor: color??_textStyle.color);
     return this;
   }
 

@@ -1,21 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/views/injectable_base.view.dart';
+import 'package:nomo_app/core/presentation/views/non_injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
-import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
+import 'package:nomo_app/features/categories/data/models/categories.model.dart';
+import 'package:nomo_app/features/categories/presentation/cubit/categories.cubit.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
 
-class CategoriesView extends StatefulWidget {
-  const CategoriesView({super.key});
+class CategoriesView extends StatelessWidget {
+  const CategoriesView({
+    super.key,
+  });
 
-  @override
-  State<CategoriesView> createState() => _CategoriesViewState();
-}
-
-class _CategoriesViewState extends State<CategoriesView> {
-  final TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    return NonInjectableBaseView<CategoriesCubit, List<CategoryModel>?>(
+      bottomSafeArea: false,
+      builder: (context, state) {
+        return CategoriesContent(
+          categories: state.data,
+        );
+      },
+      listener: (context, state) => print(state),
+    );
+  }
+}
+
+class CategoriesContent extends StatelessWidget {
+  final List<CategoryModel>? categories;
+  CategoriesContent({super.key, this.categories});
+
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    CategoriesCubit cubit = context.read<CategoriesCubit>();
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: CustomAppBar(),
@@ -29,26 +50,34 @@ class _CategoriesViewState extends State<CategoriesView> {
                 height: kToolbarHeight +
                     110, // Adjust height to compensate for the extended app bar
               ),
-              CustomText("Categories 😋").db().bold(),
-              SizedBox(
-                height: 280,
-                child: GridView.builder(
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    childAspectRatio: 0.66,
+              if (cubit.groceryCategories.isNotEmpty)
+                CustomText("Grocery & Kitchen 😋").db().bold(),
+              if (cubit.groceryCategories.isNotEmpty)
+                SizedBox(
+                  height: 280,
+                  child: GridView.builder(
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      childAspectRatio: 0.66,
+                    ),
+                    itemCount:  cubit.groceryCategories.length,
+                    itemBuilder: (context, index) {
+                      CategoryModel categoryModel =
+                          cubit.groceryCategories[index];
+                      return CategoryCard(
+                        imgUrl:categoryModel.image,
+                        title: categoryModel.name,
+                        id: categoryModel.id,
+                      );
+                    },
                   ),
-                  itemCount: 8,
-                  itemBuilder: (context, index) {
-                    return CategoryCard(
-                      imgUrl: "apple".svg,
-                      title: "Apple\nmango",
-                    );
-                  },
                 ),
-              ),
-              CustomText("Categories 😋").db().bold(),
+                if(cubit.snacksCategories.isNotEmpty)
+              CustomText("Snacks & Drinks 😋").db().bold(),
+               if(cubit.snacksCategories.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: SizedBox(
@@ -61,17 +90,22 @@ class _CategoriesViewState extends State<CategoriesView> {
                       crossAxisCount: 3,
                       childAspectRatio: 0.88,
                     ),
-                    itemCount: 9,
+                    itemCount: cubit.snacksCategories.length,
                     itemBuilder: (context, index) {
+                       CategoryModel categoryModel =
+                          cubit.snacksCategories[index];
                       return CategoryCard(
-                        imgUrl: "apple".svg,
-                        title: "Apple\nmango",
+                        imgUrl: categoryModel.image,
+                        title: categoryModel.name,
+                         id: categoryModel.id,
                       );
                     },
                   ),
                 ),
               ),
-              CustomText("Categories 😋").db().bold(),
+               if(cubit.beautyCategories.isNotEmpty)
+              CustomText("Beauty & Personal Care 😋").db().bold(),
+               if(cubit.beautyCategories.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: SizedBox(
@@ -84,11 +118,42 @@ class _CategoriesViewState extends State<CategoriesView> {
                       crossAxisCount: 3,
                       childAspectRatio: 0.88,
                     ),
-                    itemCount: 9,
+                    itemCount: cubit.beautyCategories.length,
                     itemBuilder: (context, index) {
+                       CategoryModel categoryModel =
+                          cubit.beautyCategories[index];
                       return CategoryCard(
-                        imgUrl: "apple".svg,
-                        title: "Apple\nmango",
+                        imgUrl: categoryModel.image,
+                        title: categoryModel.name,
+                         id: categoryModel.id,
+                      );
+                    },
+                  ),
+                ),
+              ),
+                if(cubit.householdCategories.isNotEmpty)
+              CustomText("Household Essentials 😋").db().bold(),
+              if(cubit.householdCategories.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: SizedBox(
+                  height: 416,
+                  child: GridView.builder(
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 0.88,
+                    ),
+                    itemCount: cubit.householdCategories.length,
+                    itemBuilder: (context, index) {
+                      CategoryModel categoryModel =
+                          cubit.householdCategories[index];
+                      return CategoryCard(
+                        imgUrl: categoryModel.image,
+                        title: categoryModel.name,
+                         id: categoryModel.id,
                       );
                     },
                   ),

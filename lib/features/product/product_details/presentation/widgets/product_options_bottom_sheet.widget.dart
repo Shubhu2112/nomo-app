@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/features/product/product_details/presentation/widgets/product_option_card.widget.dart';
+import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 
 class ProductOptionsBottomSheet {
-  static void bottomSheetMenu(BuildContext context) {
+  static void bottomSheetMenu(
+    BuildContext context, {
+    ProductModel? product,
+  }) {
     showModalBottomSheet(
         context: context,
         builder: (builder) {
@@ -25,15 +29,24 @@ class ProductOptionsBottomSheet {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: CustomText("Apple").db(),
+                        child: CustomText(product?.name ?? "").db(),
+                      ),
+                      const SizedBox(
+                        height: 8,
                       ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: 8,
+                          itemCount: product?.productOptionsValues?.length,
                           itemBuilder: (context, index) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 2),
-                              child: ProductOptionCard(),
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Card(
+                                child: ProductOptionCard(
+                                  productOptionValueModel:
+                                      product?.productOptionsValues?[index],
+                                      productModel: product,
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -41,11 +54,12 @@ class ProductOptionsBottomSheet {
                       Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: CustomPrimaryButton(
-                          onPress: () {},
+                          onPress: () {
+                            Navigator.pop(context);
+                          },
                           isExpanded: true,
-                          textValue: CustomText("Confirm")
-                              .lm()
-                              .textColor(Theme.of(context).colorScheme.onPrimary),
+                          textValue: CustomText("Confirm").lm().textColor(
+                              Theme.of(context).colorScheme.onPrimary),
                         ),
                       ),
                     ],

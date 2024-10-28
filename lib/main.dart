@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/presentation/app_theme/app_theme.dart';
+import 'package:nomo_app/core/presentation/views/custom_navigation_wrapper.widget.dart';
 import 'package:nomo_app/core/presentation/views/splash.view.dart';
 import 'package:nomo_app/core/services/flavor_services/repositories/flavor_impl.repository.dart';
 import 'package:nomo_app/core/services/flavor_services/sources/asset_flavor_impl.source.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/core/services/network_services/dio_http_impl.service.dart';
+import 'package:nomo_app/features/address/data/repositories/address_impl.repository.dart';
+import 'package:nomo_app/features/address/data/sources/address_impl.source.dart';
+import 'package:nomo_app/features/address/domain/usecase/address.usecase.dart';
+import 'package:nomo_app/features/address/presentation/cubit/add_address.cubit.dart';
+import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
+import 'package:nomo_app/features/cart/presentation/cubit/cart.cubit.dart';
+import 'package:nomo_app/features/categories/data/repositories/categories_impl.repository.dart';
+import 'package:nomo_app/features/categories/data/sources/categories_impl.source.dart';
+import 'package:nomo_app/features/categories/domain/usecase/categories.usecase.dart';
+import 'package:nomo_app/features/categories/presentation/cubit/categories.cubit.dart';
+import 'package:nomo_app/features/dashboard/data/repositories/home_impl.repository.dart';
+import 'package:nomo_app/features/dashboard/data/sources/home_impl.source.dart';
+import 'package:nomo_app/features/dashboard/domain/usecase/home.usecase.dart';
+import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
+import 'package:nomo_app/features/product/product_list/data/repository/product_list_impl.repository.dart';
+import 'package:nomo_app/features/product/product_list/data/sources/product_list_impl.dart';
+import 'package:nomo_app/features/product/product_list/domain/product_list.usecase.dart';
+import 'package:nomo_app/features/product/product_list/presentation/cubit/product_list.cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,101 +39,60 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: AppTheme.buildTheme(context),
-     
-      routes: NavigationService.generateRoute(),
-      debugShowCheckedModeBanner: false,
-      home: const SplashView(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => HomeCubit(context,
+              homeUsecase: HomeUsecase(
+                  repository: HomeImplRepository(
+                      dataSource:
+                          HomeImplDataSource(httpService: ApiRestService())))),
         ),
+        BlocProvider(
+          create: (context) => CategoriesCubit(context,
+              categoriesUsecase: CategoriesUsecase(
+                  repository: CategoriesImplRepository(
+                      dataSource: CategoriesImplDataSource(
+                          httpService: ApiRestService())))),
+        ),
+        BlocProvider(
+          create: (context) => ProductListCubit(
+            context,
+            productListUsecase: ProductListUsecase(
+                repository: ProductListImplRepository(
+                    dataSource: ProductListImplDataSource(
+                        httpService: ApiRestService()))),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => AddressListCubit(
+            context,
+            addressUsecase: AddressUsecase(
+                repository: AddressImplRepository(
+                    dataSource:
+                        AddressImplDataSource(httpService: ApiRestService()))),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => AddAddressCubit(
+            context,
+            addressUsecase: AddressUsecase(
+                repository: AddressImplRepository(
+                    dataSource:
+                        AddressImplDataSource(httpService: ApiRestService()))),
+          ),
+        ),
+        BlocProvider(create: (context) => CartCubit(context))
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: AppTheme.buildTheme(context),
+        // navigatorKey: NavigationService.navigatorKey,
+        routes: NavigationService.generateRoute(),
+        debugShowCheckedModeBanner: false,
+        //  navigatorObservers: [CustomNavigatorObserver()],
+        home: SplashView(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:nomo_app/core/data/enums/api_type.enum.dart';
 import 'package:nomo_app/core/services/flavor_services/flavor_config.dart';
 
 class ApiConstants {
-  ApiType type;
+  ApiType? type;
   late final BaseOptions networkOptions;
 
   ApiConstants(this.type) {
@@ -14,25 +14,26 @@ class ApiConstants {
     );
   }
 
-  static const String videoListEndpoint = '/getVideos';
-  static const String metalPrice = '/products/rates';
-  static const String metalChart = '/historical';
-  static const String metalBuy = '/orders/buy';
-  static const String metalSell = '/orders/sell';
-  static const String metalVault = '/orders/all';
-  static const String onboarding = '/onboardings/digigold';
-  static const String panVerify = '/panvalidation';
-  static const String bankVerify = '/bankverification';
-  static const String addressVerify = '/address';
-  static const String dgUATBaseUrl = 'https://uat-dgsvc.heytorus.com';
-
-  String getBaseUrl(ApiType apiType) {
+  String getBaseUrl(ApiType? apiType) {
     switch (apiType) {
       case ApiType.qc:
         return FlavorConfig.instance!.configuration['qcApiBaseUrl'];
 
       default:
-        throw Exception("Invalid API type");
+        return FlavorConfig.instance!.configuration['baseUrl'];
     }
   }
+
+  static const String appConfig = '/config';
+
+  static const String sendOtp = "/otp/send";
+  static const String verifyOtp = "/auth/verify-otp";
+  static const String updateUserName = "/auth/update-name";
+  static const String getUser = "/auth/me";
+  static const String addresses = "/address";
+
+  static const String categories = '/category';
+  static const String subCategories = '/sub-category';
+  static const String products = '/products';
+  static const String metalPrice = '/products/rates';
 }

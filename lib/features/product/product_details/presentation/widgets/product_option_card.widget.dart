@@ -1,78 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
-import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/features/product/product_details/presentation/widgets/product_price.widget.dart';
+import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
+import 'package:nomo_app/features/product/product_list/data/models/product_option_value.model.dart';
+import 'package:nomo_app/features/product/product_list/presentation/widgets/add_to_cart_button.widget.dart';
 
 class ProductOptionCard extends StatelessWidget {
-  final double? maxRetailPrice;
-  final double? sellingPrice;
-  final String? productName;
-  final String? productOptionName;
-  final String? productOptionValueName;
-  final String? productImg;
-  final String? productDescription;
-  final bool isProductCard;
+  final ProductOptionValueModel? productOptionValueModel;
+  final ProductModel? productModel;
+
   const ProductOptionCard({
     super.key,
-    this.maxRetailPrice = 90,
-    this.productName = "Apple",
-    this.productOptionName = "Select Unit",
-    this.productOptionValueName = "1Kg",
-    this.sellingPrice = 42,
-    this.productImg,
-    this.productDescription =
-        "Apples are nutritious. Apples may be good for weight loss. apples may be good for your heart. As part of a healtful and varied diet.",
-    this.isProductCard = false,
+    this.productOptionValueModel,
+    this.productModel,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Row(
-              children: [
-                SvgPicture.asset(
-                  "apple".svg,
-                  fit: BoxFit.fill,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              if (productOptionValueModel?.image != null)
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Image.network(
+                    productOptionValueModel!.image!,
+                    fit: BoxFit.fill,
+                    height: 40,
+                    width: 40,
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  child: SvgPicture.asset(
+                    "apple".svg,
+                    fit: BoxFit.fill,
+                  ),
                 ),
-                const SizedBox(
-                  width: 6,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isProductCard) CustomText(productName ?? "").db(),
-                    CustomText(productOptionValueName ?? "").lm(),
-                  ],
-                ),
-              ],
+              const SizedBox(width: 6),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomText(productOptionValueModel?.name ?? "").lm(),
+                ],
+              ),
+            ],
+          ),
+          ProductPriceWidget(
+            maxRetailPrice: productOptionValueModel?.maxRetailPrice,
+            sellingPrice: productOptionValueModel?.sellingPrice ?? 0,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: AddToCartButtonWidget(
+              productModel: productModel,
+              productOptionValueModel: productOptionValueModel,
             ),
-            Row(
-              children: [
-                CustomText("₹$sellingPrice").dm().bold(),
-                const SizedBox(
-                  width: 6,
-                ),
-                CustomText("₹$maxRetailPrice")
-                    .decoration(TextDecoration.lineThrough)
-                    .fontSize(12),
-              ],
-            ),
-            CustomPrimaryButton(
-              onPress: () {},
-              textValue: CustomText("ADD")
-                  .lm()
-                  .textColor(Theme.of(context).colorScheme.onPrimary),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

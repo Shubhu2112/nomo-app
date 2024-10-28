@@ -11,7 +11,7 @@ class FlavorDataSourceImpl implements FlavorDataSource {
   @override
   Future<Map<String, dynamic>?> getAppConfiguration() async {
     final apiResponse =
-        await _httpService.handleGetRequest(ApiConstants.videoListEndpoint);
+        await _httpService.handleGetRequest(ApiConstants.appConfig);
     return apiResponse?.data;
   }
 }

@@ -13,18 +13,19 @@ class GradientCard extends StatelessWidget {
         height: 44, // Adjust the height as necessary
         width: double.infinity, // Adjust the width as necessary
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color(0xFFFB9DA5),
-              Color(0xFFCB1927), // Reduced opacity
-              Color(0xFFCB1927), // Middle color with opacity
-              // End color with opacity
-            ],
-            stops: [0.87, 0.42, 0.11], // As per the design
-            begin: Alignment(0.0, -1.0),
-            end: Alignment(1.0, 0.0),
-            transform: GradientRotation(0.7853982),
-          ),
+       color: Color(0xffF4E2E4),
+          // gradient: const LinearGradient(
+          //   colors: [
+          //     Color(0xFFFB9DA5),
+          //     Color(0xFFCB1927), // Reduced opacity
+          //     Color(0xFFCB1927), // Middle color with opacity
+          //     // End color with opacity
+          //   ],
+          //   stops: [0.87, 0.42, 0.11], // As per the design
+          //   begin: Alignment(0.0, -1.0),
+          //   end: Alignment(1.0, 0.0),
+          //   transform: GradientRotation(0.7853982),
+          // ),
           borderRadius: BorderRadius.circular(12.0),
           boxShadow: [
             BoxShadow(

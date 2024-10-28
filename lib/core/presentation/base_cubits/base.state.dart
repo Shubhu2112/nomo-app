@@ -15,6 +15,11 @@ class BaseCompletedState<T> extends BaseState<T> {
   BaseCompletedState({this.data});
 }
 
+class BaseUpdateState<T> extends BaseState<T> {
+  final T? data;
+  BaseUpdateState({this.data});
+}
+
 class BaseErrorState<T> extends BaseState<T> {
   final String? errorMessage;
   BaseErrorState({this.errorMessage});

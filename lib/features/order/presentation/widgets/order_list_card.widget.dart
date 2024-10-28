@@ -8,19 +8,20 @@ import 'package:nomo_app/features/order/presentation/views/order_summary.view.da
 class OrderListCardWidget extends StatelessWidget {
   const OrderListCardWidget({super.key});
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: InkWell(
         onTap: () {
-           NavigationService.goNext(context, OrderSummaryView.routeName);
+          NavigationService.goNext(context, OrderSummaryView.routeName);
         },
         child: Card(
           child: Column(
-            children: [ 
+            children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -42,7 +43,7 @@ class OrderListCardWidget extends StatelessWidget {
                               children: [
                                 CustomText(
                                   "200",
-                                  showSymbol: true,
+                                  showCurrencySymbol: true,
                                 ).lm(),
                                 CustomText("•").dm(),
                                 CustomText(
@@ -86,7 +87,7 @@ class OrderListCardWidget extends StatelessWidget {
                             ),
                           ),
                         );
-        
+
                         // Padding(
                         //   padding: const EdgeInsets.all(4.0),
                         //   child: Container(

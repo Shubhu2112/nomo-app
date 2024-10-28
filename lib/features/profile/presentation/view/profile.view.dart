@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
 import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
+import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
 import 'package:nomo_app/features/order/presentation/views/orders_list.view.dart';
 import 'package:nomo_app/features/profile/presentation/widgets/profile_list_item.widget.dart';
 
 import '../../../../core/services/navigation_services/navigation_service.dart';
 
 class ProfileView extends StatelessWidget {
-
   const ProfileView({super.key});
 
   @override
@@ -46,7 +47,9 @@ class ProfileView extends StatelessWidget {
                       const SizedBox(
                         height: 8,
                       ),
-                      CustomText("Sagar Sachdev").db().bold(),
+                      CustomText(context.read<HomeCubit>().userModel ?.name ?? "")
+                          .db()
+                          .bold(),
                     ],
                   ),
                   const SizedBox(

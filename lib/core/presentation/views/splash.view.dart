@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/services/cookie_services/cookie.service.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
 import 'package:nomo_app/features/dashboard/presentation/view/dashboard.view.dart';
@@ -62,10 +63,16 @@ class _SplashViewState extends State<SplashView>
     });
 
     // Navigate to the next screen after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () async {
       // You can navigate to the next screen here
+
+      String? accessToken = await CookieService.retrieveData('token');
       if (mounted) {
-        NavigationService.goNextFinishAll(context, OtpView.routeName);
+        if (accessToken != null) {
+          NavigationService.goNextFinishAll(context, DashboardView.routeName);
+        } else {
+          NavigationService.goNextFinishAll(context, OtpView.routeName);
+        }
       }
     });
   }

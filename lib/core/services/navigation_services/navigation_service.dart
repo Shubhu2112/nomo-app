@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nomo_app/core/presentation/views/custom_navigation_wrapper.widget.dart';
 import 'package:nomo_app/features/address/presentation/view/add_address.view.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
 import 'package:nomo_app/features/address/presentation/widgets/add_address_bottomsheet.widget.dart';
@@ -10,10 +11,12 @@ import 'package:nomo_app/features/order/presentation/widgets/order_success.widge
 import 'package:nomo_app/features/order/presentation/views/order_summary.view.dart';
 import 'package:nomo_app/features/order/presentation/views/orders_list.view.dart';
 import 'package:nomo_app/features/product/product_details/presentation/view/product_details.view.dart';
-import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_categories.view.dart';
+import 'package:nomo_app/features/sub_categories/presentation/view/sub_categories.view.dart';
 
 class NavigationService {
   NavigationService._();
+
+   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   static String currentRoute = "/myapp_screen";
   static String previousRoute = "/myapp_screen";
@@ -23,7 +26,7 @@ class NavigationService {
 
   static Map<String, Widget Function(BuildContext context)> generateRoute() {
     return {
-      OtpView.routeName: (context) =>  OtpView(),
+      OtpView.routeName: (context) =>  const OtpView(),
       DashboardView.routeName: (context) => const DashboardView(),
       ProductDetailsView.routeName: (context) => const ProductDetailsView(),
       SubCategoriesView.routeName: (context) => const SubCategoriesView(),
@@ -92,6 +95,20 @@ class NavigationService {
     }
     Navigator.of(context).pop();
   }
+
+static bool canGoBack({bool checkDashboard = true}) {
+  // Check if there are any routes left in the navigation stack
+  if (navstack.isEmpty) return false;
+
+  // Optionally check if the current route is "/dashboard_view"
+  if (checkDashboard && currentRoute == "/dashboard_view") {
+    return false;
+  }
+
+  return true;
+}
+
+
 
   static goHardwareBack(BuildContext context) {
     navstack.removeLast();

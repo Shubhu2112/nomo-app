@@ -1,15 +1,17 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart'; // Import for Geocoding
+import 'package:geocoding/geocoding.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/address/presentation/cubit/add_address.cubit.dart';
+import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
 import 'package:nomo_app/features/address/presentation/widgets/add_address_bottomsheet.widget.dart';
 
 class AddAddressView extends StatefulWidget {
@@ -66,6 +68,13 @@ class _AddAddressViewState extends State<AddAddressView> {
           await placemarkFromCoordinates(position.latitude, position.longitude);
       Placemark place = placemarks.first;
 
+      if (mounted) {
+        final cubit = context.read<AddAddressCubit>();
+        cubit.address = cubit.address?.copyWith(
+            lat: position.latitude.toString(),
+            long: position.longitude.toString(),
+            pincode: int.parse(place.postalCode ?? "0"));
+      }
       setState(() {
         _currentAddress =
             "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
@@ -105,6 +114,7 @@ class _AddAddressViewState extends State<AddAddressView> {
       mapController?.animateCamera(CameraUpdate.newLatLng(selectedLatLng));
       setState(() {
         _center = selectedLatLng;
+
         _currentAddress = prediction.description;
       });
     } catch (e) {
@@ -136,7 +146,11 @@ class _AddAddressViewState extends State<AddAddressView> {
               onPress: () {
                 AddAddressBottomSheet.show(
                   context,
-                  () {},
+                  () {
+                    Navigator.pop(context);
+                    NavigationService.goBack(context);
+                    context.read<AddressListCubit>().init();
+                  },
                 );
               },
             ),

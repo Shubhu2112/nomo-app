@@ -1,18 +1,55 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/views/injectable_base.view.dart';
+import 'package:nomo_app/core/presentation/views/non_injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
+import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
+import 'package:nomo_app/features/categories/data/models/categories.model.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
-import 'package:nomo_app/features/product/presentation/widgets/product_card.widget.dart';
+import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
+import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
+import 'package:nomo_app/features/product/product_list/presentation/widgets/product_card.widget.dart';
 
 class HomeView extends StatelessWidget {
   final Function()? onProfileTap;
   final Function()? onCategoriesTap;
-  HomeView({super.key, this.onProfileTap, this.onCategoriesTap});
+
+  const HomeView({super.key, this.onProfileTap, this.onCategoriesTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return NonInjectableBaseView<HomeCubit,
+        (List<CategoryModel>?, List<ProductModel>?)>(
+      bottomSafeArea: false,
+      builder: (context, state) {
+        return HomeViewContent(
+          onCategoriesTap: onCategoriesTap,
+          onProfileTap: onProfileTap,
+          categories: state.data?.$1,
+          bestSellingProducts: state.data?.$2,
+        );
+      },
+      listener: (context, state) => print(state),
+    );
+  }
+}
+
+class HomeViewContent extends StatelessWidget {
+  final Function()? onProfileTap;
+  final Function()? onCategoriesTap;
+  final List<CategoryModel>? categories;
+  final List<ProductModel>? bestSellingProducts;
+  HomeViewContent(
+      {super.key,
+      this.onProfileTap,
+      this.onCategoriesTap,
+      this.categories,
+      this.bestSellingProducts});
   final TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -153,16 +190,18 @@ class HomeView extends StatelessWidget {
           // Sliver for the horizontal list of categories
           SliverToBoxAdapter(
             child: SizedBox(
-              height: 120,
+              height: 130,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
+                  CategoryModel? category = categories?[index];
                   return CategoryCard(
-                    imgUrl: "apple".svg,
-                    title: "Apple",
+                    imgUrl: category?.image,
+                    title: category?.name,
+                    id: category?.id,
                   );
                 },
-                itemCount: 8,
+                itemCount: categories?.length,
               ),
             ),
           ),
@@ -186,13 +225,13 @@ class HomeView extends StatelessWidget {
             sliver: SliverGrid.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, childAspectRatio: 0.8),
-              itemCount: 8,
+              itemCount: bestSellingProducts?.length,
               itemBuilder: (context, index) {
-                return const ProductCard(
-                  productName: "Bell Pepper Red",
-                  maxRetailPrice: 90,
-                  sellingPrice: 42,
-                  productOptionValueName: "1kg",
+                ProductModel? product = bestSellingProducts?[index];
+                return ProductCard(
+                  isSubCategory: false,
+                 productModel: product,
+                
                 );
               },
             ),

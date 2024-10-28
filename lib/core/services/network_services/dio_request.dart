@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nomo_app/core/data/constant/api_constants.dart';
 import 'package:nomo_app/core/data/enums/api_type.enum.dart';
+import 'package:nomo_app/core/services/cookie_services/cookie.service.dart';
 // import 'package:torus/core/constant/api_constants.dart';
 
 class Request {
@@ -13,16 +14,14 @@ class Request {
       {bool isPublic = true,
       Function({required String message})? onError,
       ApiType? type}) {
-    final BaseOptions networkOptions =
-        ApiConstants(type ?? ApiType.qc).networkOptions;
+    final BaseOptions networkOptions = ApiConstants(type).networkOptions;
     Dio dio = Dio(networkOptions);
     print(dio.options.baseUrl);
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         if (!isPublic) {
-          // String? accessToken =
-          //     await securedStorageService.read(key: 'accessToken');
-          // options.headers['authorization'] = 'Bearer $accessToken';
+          String? accessToken = await CookieService.retrieveData('token');
+          options.headers['authorization'] = 'Bearer $accessToken';
         }
 
         return handler.next(options);
@@ -33,7 +32,7 @@ class Request {
       },
       onError: (e, handler) {
         Fluttertoast.showToast(
-            msg: e.response?.data["detail"] ?? "Something went wrong",
+            msg: e.response?.data["message"] ?? "Something went wrong",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 10,

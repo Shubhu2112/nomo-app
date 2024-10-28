@@ -1,15 +1,24 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:nomo_app/core/common/parser/query_helper.dart';
 import 'package:nomo_app/core/data/enums/api_type.enum.dart';
 import 'package:nomo_app/core/services/network_services/dio_request.dart';
 import 'package:nomo_app/core/services/network_services/http.service.dart';
 
 // ApiResponse class to handle API responses
 class ApiResponse<T> {
-  final T data;
-  final String? errorMessage;
+  T? data;
+  String? errorMessage;
+  int? statusCode;
+  String? message;
+  String? accessToken;
 
-  ApiResponse({required this.data, this.errorMessage});
+  ApiResponse(
+      {this.data,
+      this.errorMessage,
+      this.message,
+      this.statusCode,
+      this.accessToken});
 }
 
 // ApiRestService class implementing HttpService
@@ -19,14 +28,17 @@ class ApiRestService implements HttpService {
     String endPoint, {
     bool isPublic = true,
     Map<String, dynamic> queryParameters = const {},
+    Params? params,
     ApiType? type,
     Function({required String message})? onError,
   }) async {
     try {
-      Dio dio = Request.createApiClient(onError: onError, isPublic: isPublic,type: type);
+      Dio dio = Request.createApiClient(
+          onError: onError, isPublic: isPublic, type: type);
 
       final response = await dio.get(
-        endPoint,
+        endPoint +
+            (params != null ? QueryHelper.buildUrlFromParams(params) : ""),
         queryParameters: queryParameters,
       );
 
@@ -50,19 +62,22 @@ class ApiRestService implements HttpService {
     bool isPublic = true,
     Map<String, dynamic> queryParameters = const {},
     ApiType? type,
+    Params? params,
     Function({required String message})? onError,
   }) async {
     try {
-      Dio dio = Request.createApiClient(onError: onError, isPublic: isPublic,type: type);
+      Dio dio = Request.createApiClient(
+          onError: onError, isPublic: isPublic, type: type);
 
       final response = await dio.get(
-        endPoint,
+        endPoint +
+            (params != null ? QueryHelper.buildUrlFromParams(params) : ""),
         queryParameters: queryParameters,
       );
 
       List<Map<String, dynamic>> apiResponse =
-          (response.data != null && response.data is List)
-              ? List<Map<String, dynamic>>.from(response.data)
+          (response.data != null && response.data['data'] is List)
+              ? List<Map<String, dynamic>>.from(response.data['data'])
               : [];
 
       return ApiResponse(data: apiResponse);
@@ -84,7 +99,8 @@ class ApiRestService implements HttpService {
     Function({required String message})? onError,
   }) async {
     try {
-      Dio dio = Request.createApiClient(onError: onError, isPublic: isPublic,type: type);
+      Dio dio = Request.createApiClient(
+          onError: onError, isPublic: isPublic, type: type);
       print(dio);
       final response = await dio.post(
         endPoint,
@@ -97,7 +113,11 @@ class ApiRestService implements HttpService {
               ? Map<String, dynamic>.from(response.data)
               : {};
 
-      return ApiResponse(data: apiResponse);
+      return ApiResponse(
+          data: apiResponse["data"],
+          accessToken: apiResponse["accessToken"],
+          message: apiResponse["message"],
+          statusCode: apiResponse["statusCode"]);
     } catch (e) {
       if (kDebugMode) {
         print("Error ${e.toString()}");
@@ -116,7 +136,8 @@ class ApiRestService implements HttpService {
     Function({required String message})? onError,
   }) async {
     try {
-      Dio dio = Request.createApiClient(onError: onError, isPublic: isPublic,type: type);
+      Dio dio = Request.createApiClient(
+          onError: onError, isPublic: isPublic, type: type);
 
       final response = await dio.post(
         endPoint,
@@ -149,7 +170,8 @@ class ApiRestService implements HttpService {
   }) async {
     {
       try {
-        Dio dio = Request.createApiClient(onError: onError, isPublic: isPublic,type: type);
+        Dio dio = Request.createApiClient(
+            onError: onError, isPublic: isPublic, type: type);
 
         final response = await dio.put(
           endPoint,
@@ -181,7 +203,8 @@ class ApiRestService implements HttpService {
     Function({required String message})? onError,
   }) async {
     try {
-      Dio dio = Request.createApiClient(onError: onError, isPublic: isPublic, type: type);
+      Dio dio = Request.createApiClient(
+          onError: onError, isPublic: isPublic, type: type);
 
       final response = await dio.delete(
         endPoint,

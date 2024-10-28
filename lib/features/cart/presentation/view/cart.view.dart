@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_bottom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/shared_ui.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/address/data/models/address.model.dart';
+import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
+import 'package:nomo_app/features/address/presentation/view/add_address.view.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
+import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
+import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
+import 'package:nomo_app/features/cart/domain/cart.useCase.dart';
+import 'package:nomo_app/features/cart/presentation/cubit/cart.cubit.dart';
+import 'package:nomo_app/features/cart/presentation/cubit/state/cart.state.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_item.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/gradient_offer_card.widget.dart';
+import 'package:nomo_app/features/cart/presentation/widgets/product_cart_card.widget.dart';
+import 'package:nomo_app/features/cart/presentation/widgets/product_options_cart_card.widget.dart';
+import 'package:nomo_app/features/dashboard/presentation/view/dashboard.view.dart';
 import 'package:nomo_app/features/order/presentation/views/order_status.view.dart';
 import 'package:nomo_app/features/order/presentation/widgets/order_success.widget.dart';
 import 'package:nomo_app/features/product/product_details/presentation/widgets/product_option_card.widget.dart';
-import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_categories.view.dart';
+import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
+import 'package:nomo_app/features/product/product_list/data/models/product_option_value.model.dart';
 
 class CartView extends StatelessWidget {
   static String routeName = "/cart_view";
@@ -20,32 +33,47 @@ class CartView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    CartState? cartState = context.watch<CartCubit>().cartState;
+    ({
+      double maxRetailPriceTotal,
+      double priceTotal,
+      double totalSavings
+    }) cartAmount = CartUsecase.calculateCartTotal(cartState?.cartItems ?? []);
+
+    AddressModel? selectedAddressModel =
+        context.watch<AddressListCubit>().selectedAddress;
+
     return Scaffold(
-      
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: CustomPrimaryButton(
           width: double.infinity,
-          textValue: CustomText("Click to Pay (₹120)  >")
+          textValue: CustomText(selectedAddressModel == null
+                  ? "Add Address to Proceed"
+                  : "Click to Pay (₹ ${cartAmount.priceTotal})  >")
               .lb()
               .textColor(Theme.of(context).colorScheme.surface),
           onPress: () {
-            SharedUi.showCustomDialog(context,
-                child: const OrderSuccessWidget());
-            Future.delayed(
-              const Duration(milliseconds: 1400),
-              () {
-                if (context.mounted) {
-                  NavigationService.goNext(context, OrderStatusView.routeName);
-                }
-              },
-            );
+            if (selectedAddressModel == null) {
+              NavigationService.goNext(context, AddAddressView.routeName);
+            } else {
+              SharedUi.showCustomDialog(context,
+                  child: const OrderSuccessWidget());
+              Future.delayed(
+                const Duration(milliseconds: 1400),
+                () {
+                  if (context.mounted) {
+                    NavigationService.goNext(
+                        context, OrderStatusView.routeName);
+                  }
+                },
+              );
+            }
           },
         ),
       ),
       appBar: CustomBottomAppbar(
         title: "Your Cart",
-        
         bottomWidget: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 2),
           child: Row(
@@ -58,31 +86,34 @@ class CartView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CustomText("Ordering for Sagar").db().bold(),
-                    InkWell(
-                      onTap: () {
-                        NavigationService.goNext(
-                            context, AddressListView.routeName);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(1.6),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: CustomText(
-                                "B-003, Blue pearl CHS, Malad west - 400064",
-                              )
-                                  .lm()
-                                  .overflow(TextOverflow.ellipsis)
-                                  .maxLines(1),
-                            ),
-                            Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Theme.of(context).colorScheme.onSecondary,
-                            ),
-                          ],
+                    if (selectedAddressModel?.streetName1 != null)
+                      InkWell(
+                        onTap: () {
+                          NavigationService.goNext(
+                              context, AddressListView.routeName,
+                              arg: {"isCart": true});
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(1.6),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: CustomText(
+                                  "${selectedAddressModel?.streetName1 ?? ""},${selectedAddressModel?.streetName2 ?? ""}, ${selectedAddressModel?.pincode ?? ""}",
+                                )
+                                    .lm()
+                                    .overflow(TextOverflow.ellipsis)
+                                    .maxLines(1),
+                              ),
+                              Icon(
+                                Icons.keyboard_arrow_down,
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -97,9 +128,13 @@ class CartView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const GradientCard(),
-              CustomText("Review items").db().bold(),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: CustomText("Review items").db().bold(),
+              ),
               Card(
-                color: Theme.of(context).primaryColor.withOpacity(0.33),
+                color: const Color(0xffF4E2E4),
+                elevation: 6,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -116,7 +151,9 @@ class CartView extends StatelessWidget {
                             Row(
                               children: [
                                 Image.asset("grocery_delivery".png),
-                                CustomText("4 items").lm(),
+                                CustomText(
+                                        "${cartState?.cartItems.length} items")
+                                    .lm(),
                               ],
                             ),
                           ],
@@ -130,9 +167,41 @@ class CartView extends StatelessWidget {
                             true, // Allows ListView to shrink to the height of its content
                         physics:
                             const NeverScrollableScrollPhysics(), // Prevents it from scrolling separately
-                        itemCount: 5, // Number of items
+                        itemCount:
+                            cartState?.cartItems.length, // Number of items
                         itemBuilder: (context, index) {
-                          return const ProductOptionCard(isProductCard: true);
+                          CartItemModel? cartItemModel =
+                              cartState?.cartItems[index];
+
+                          if (cartItemModel?.productOptionValueId == 0) {
+                            return ProductCartCard(
+                              productModel: ProductModel(
+                                  id: cartItemModel?.productId,
+                                  maxRetailPrice: cartItemModel?.maxRetailPrice,
+                                  sellingPrice: cartItemModel?.price,
+                                  image: cartItemModel?.image,
+                                  name: cartItemModel?.name,
+                                  unit: cartItemModel?.unit),
+                            );
+                          } else {
+                            return ProductOptionCartCard(
+                              productModel: ProductModel(
+                                  id: cartItemModel?.productId,
+                                  maxRetailPrice: cartItemModel?.maxRetailPrice,
+                                  sellingPrice: cartItemModel?.price,
+                                  image: cartItemModel?.image,
+                                  name: cartItemModel?.name,
+                                  unit: cartItemModel?.unit),
+                              productOptionValueModel: ProductOptionValueModel(
+                                  id: cartItemModel?.productOptionValueId,
+                                  maxRetailPrice: cartItemModel?.maxRetailPrice,
+                                  sellingPrice: cartItemModel?.price,
+                                  productsId: cartItemModel?.productId,
+                                  image: cartItemModel?.image,
+                                  name: cartItemModel?.name,
+                                  unit: cartItemModel?.unit),
+                            );
+                          }
                         },
                       ),
                     ],
@@ -143,17 +212,25 @@ class CartView extends StatelessWidget {
                 height: 6,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  NavigationService.goNextFinishAll(
+                      context, DashboardView.routeName);
+                  // if (NavigationService.canGoBack()) {
+                  //   NavigationService.goBack(context);
+                  // }
+                },
                 child: Card(
+                  elevation: 6,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CustomText("Missed Something? ").db(),
+                        CustomText("Missed Something? ").ds().bold(),
                         CustomText("Add More items")
-                            .db()
+                            .ds()
                             .textColor(Theme.of(context).primaryColor)
+                            .bold()
                       ],
                     ),
                   ),
@@ -162,30 +239,43 @@ class CartView extends StatelessWidget {
               const SizedBox(
                 height: 6,
               ),
-              CustomText("Bill Summary").db().bold(),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: CustomText("Bill Summary").db().bold(),
+              ),
               Card(
-                color: Theme.of(context).primaryColor.withOpacity(0.33),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
+                elevation: 6,
+                color: const Color(0xffF4E2E4),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(children: [
-                    BillSummaryItemWidget(title: "MRP Total", value: 140),
-                    BillSummaryItemWidget(title: "GST (18%)", value: 0),
-                    BillSummaryItemWidget(title: "Items Savings", value: 40),
-                    BillSummaryItemWidget(title: "Delivery Fee", value: 0),
-                    SizedBox(height: 4),
-                    Divider(thickness: 2),
-                    SizedBox(height: 6),
-                    BillSummaryItemWidget(title: "To Pay", value: 100),
+                    BillSummaryItemWidget(
+                        title: "MRP Total",
+                        value: cartAmount.maxRetailPriceTotal),
+                    const BillSummaryItemWidget(title: "GST (18%)", value: 0),
+                    BillSummaryItemWidget(
+                        title: "Items Savings", value: cartAmount.totalSavings),
+                    const BillSummaryItemWidget(
+                        title: "Delivery Fee", value: 0),
+                    const SizedBox(height: 4),
+                    const Divider(thickness: 2),
+                    const SizedBox(height: 6),
+                    BillSummaryItemWidget(
+                        title: "To Pay", value: cartAmount.priceTotal),
                   ]),
                 ),
               ),
               const SizedBox(
                 height: 6,
               ),
-              CustomText("Review your order to avoid cancellations")
-                  .dm()
-                  .bold(),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: CustomText("Review your order to avoid cancellations")
+                    .dm()
+                    .bold(),
+              ),
               Card(
+                elevation: 6,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -193,17 +283,17 @@ class CartView extends StatelessWidget {
                     children: [
                       CustomText(
                               "NOTE: Orders cannot be canceled and are non-refundable once packed for delivery.")
-                          .dm(),
+                          .ds(),
                       CustomText("Read Cancellation Policy")
-                          .dm()
-                          .decoration(TextDecoration.underline)
+                          .ds()
                           .textColor(Theme.of(context).primaryColor)
+                          .decoration(TextDecoration.underline)
                     ],
                   ),
                 ),
               ),
               const SizedBox(
-                  height: kToolbarHeight + 50), // Add space at the bottom
+                  height: kToolbarHeight - 50), // Add space at the bottom
             ],
           ),
         ),
