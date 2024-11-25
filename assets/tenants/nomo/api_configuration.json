@@ -3,7 +3,7 @@
   "timeout": 120,
   "retry": 3,
   "Dev": {
-    "baseUrl": "http://192.168.29.221:3000",
+    "baseUrl": "https://nomo-staging.up.railway.app",
     "mfApiBaseUrl": "https://uat-publicsvc.heytorus.com/mutualfund/api",
     "authApiBaseUrl": "https://uat-publicsvc.heytorus.com/users/api",
     "esApiBaseUrl": "https://elastic:oE4QEqoZtjSpZX07IHmBiepy@eb9edd9570f44fe79a3d1f9bbab4193e.us-central1.gcp.cloud.es.io",
