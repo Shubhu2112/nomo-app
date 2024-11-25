@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/views/dependency_injection/get_it_dependency_injection.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/core/services/bloc_services/bloc_manager.dart';
+import 'package:nomo_app/core/services/cookie_services/cookie.service.dart';
+import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
 import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
+import 'package:nomo_app/features/cart/presentation/cubit/cart.cubit.dart';
+import 'package:nomo_app/features/cart/presentation/cubit/state/cart.state.dart';
 import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
 import 'package:nomo_app/features/order/presentation/views/orders_list.view.dart';
 import 'package:nomo_app/features/profile/presentation/widgets/profile_list_item.widget.dart';
@@ -22,6 +28,7 @@ class ProfileView extends StatelessWidget {
         children: [
           Image.asset(
             "profile_background".png,
+            width: double.infinity,
             fit: BoxFit.cover,
           ),
           // const SafeArea(
@@ -47,7 +54,8 @@ class ProfileView extends StatelessWidget {
                       const SizedBox(
                         height: 8,
                       ),
-                      CustomText(context.read<HomeCubit>().userModel ?.name ?? "")
+                      CustomText(
+                              context.read<HomeCubit>().userModel?.name ?? "")
                           .db()
                           .bold(),
                     ],
@@ -107,9 +115,21 @@ class ProfileView extends StatelessWidget {
                         .lb()
                         .textColor(Theme.of(context).colorScheme.surface)
                         .bold(),
-                    onPress: () {
-                      NavigationService.popUntilAndPush(
-                          context, OtpView.routeName);
+                    onPress: () async {
+                      await CookieService.removeData("token");
+
+                      if (context.mounted) {
+                        context.read<CartCubit>().cartState?.cartItems = [];
+                      }
+                      await getIt.unregister<CartCubit>();
+                      await getIt.reset(dispose: true);
+                      if (context.mounted) {
+                        ServiceLocator.setup(context);
+                      }
+                      if (context.mounted) {
+                        NavigationService.popUntilAndPush(
+                            context, OtpView.routeName);
+                      }
                     },
                   )
                 ],

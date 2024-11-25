@@ -22,8 +22,15 @@ class AuthUsecase {
     return await _repository.updateName(contactNum, name);
   }
 
+   Future<UserModel?> updateFcmToken( String? fcmToken) async {
+    return await _repository.updateFcmToken(fcmToken);
+  }
+
  Future<UserModel?> getUser() async {
     return await _repository.getUser();
   }
+
+
+
 
 }

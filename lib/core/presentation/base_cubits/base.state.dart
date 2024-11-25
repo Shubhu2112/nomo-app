@@ -3,7 +3,13 @@ abstract class BaseState<T> {
 }
 
 class BaseInitialState<T> extends BaseState<T> {
-  const BaseInitialState();
+  final String? initMessage;
+  const BaseInitialState({this.initMessage});
+}
+
+class BaseLoginState<T> extends BaseState<T> {
+  final String? initMessage;
+  const BaseLoginState({this.initMessage});
 }
 
 class BaseLoadingState<T> extends BaseState<T> {

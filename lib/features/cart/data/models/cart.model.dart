@@ -7,13 +7,15 @@ part 'cart.model.g.dart';
 @freezed
 class CartModel with _$CartModel {
   factory CartModel({
-    int? id,
-    bool? enabled,
-    String? userId,
-    double? totalAmount,
-    double? savings,
-    DateTime? createdTime,
-    DateTime? updatedTime,
+    @JsonKey(includeToJson: false) int? id,
+    @JsonKey(includeToJson: false) bool? enabled,
+    @JsonKey(includeToJson: false) String? userId,
+    int? storeId,
+    @JsonKey(includeIfNull: false) int? addressId,
+    @JsonKey(includeToJson: false) double? totalAmount,
+    @JsonKey(includeToJson: false) double? savings,
+    @JsonKey(includeToJson: false) DateTime? createdTime,
+    @JsonKey(includeToJson: false) DateTime? updatedTime,
     List<CartItemModel>? cartItems,
   }) = _CartModel;
 

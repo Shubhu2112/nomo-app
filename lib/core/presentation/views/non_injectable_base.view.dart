@@ -9,6 +9,8 @@ class NonInjectableBaseView<T extends BaseCubit<E>, E> extends StatelessWidget {
   final Function(BuildContext context, BaseState state) listener;
   final Widget Function(BuildContext context, BaseErrorState state)?
       errorBuilder;
+      final Widget Function(BuildContext context,  BaseInitialState state)?
+      initBuilder;
   final Widget Function(BuildContext context, BaseState state)? loadingbuilder;
 
   // Scaffold properties
@@ -20,20 +22,20 @@ class NonInjectableBaseView<T extends BaseCubit<E>, E> extends StatelessWidget {
   final bool extendBody;
   final bool extendBodyBehindAppBar;
 
-  const NonInjectableBaseView({
-    super.key,
-    required this.builder,
-    required this.listener,
-    this.errorBuilder,
-    this.loadingbuilder,
-    this.appBar,
-    this.floatingActionButton,
-    this.bottomNavigationBar,
-    this.drawer,
-    this.bottomSafeArea = true,
-    this.extendBody = false,
-    this.extendBodyBehindAppBar = false
-  });
+  const NonInjectableBaseView(
+      {super.key,
+      required this.builder,
+      required this.listener,
+      this.errorBuilder,
+      this.initBuilder,
+      this.loadingbuilder,
+      this.appBar,
+      this.floatingActionButton,
+      this.bottomNavigationBar,
+      this.drawer,
+      this.bottomSafeArea = true,
+      this.extendBody = false,
+      this.extendBodyBehindAppBar = false});
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +47,21 @@ class NonInjectableBaseView<T extends BaseCubit<E>, E> extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             appBar: appBar,
-            extendBody:  extendBody,
+            extendBody: extendBody,
             extendBodyBehindAppBar: extendBodyBehindAppBar,
             floatingActionButton: floatingActionButton,
             bottomNavigationBar: bottomNavigationBar,
             drawer: drawer,
             body: Stack(
               children: [
+                //  if (state is BaseInitialState)
+                //   initBuilder != null
+                //       ? initBuilder!(context, state)
+                //       : Center(
+                //           child: Text(
+                //           state.initMessage ?? "init...",
+                //           textAlign: TextAlign.center,
+                //         )),
                 if (state is BaseCompletedState)
                   builder(context, state as BaseCompletedState<E>),
                 if (state is BaseErrorState)
@@ -60,7 +70,10 @@ class NonInjectableBaseView<T extends BaseCubit<E>, E> extends StatelessWidget {
                       : Center(
                           child: Text(
                           state.errorMessage ?? "Something went wrong.",
+                          textAlign: TextAlign.center,
                         )),
+
+                        
                 if ((state is BaseLoadingState &&
                         context.read<T>().isLoading) ||
                     state is BaseInitialState)

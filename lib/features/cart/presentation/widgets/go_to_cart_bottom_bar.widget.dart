@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
-import 'package:nomo_app/features/cart/domain/cart.useCase.dart';
+import 'package:nomo_app/features/cart/domain/cart.usecase.dart';
 import 'package:nomo_app/features/cart/presentation/cubit/cart.cubit.dart';
 import 'package:nomo_app/features/cart/presentation/view/cart.view.dart';
 

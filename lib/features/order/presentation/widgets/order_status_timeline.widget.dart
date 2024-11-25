@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/features/order/data/common/enum/order_status.enum.dart';
+import 'package:nomo_app/features/order/presentation/cubits/order_status_timeline.cubit.dart';
 import 'package:timelines/timelines.dart';
-
-// Define the enum for the delivery stages
-enum DeliveryStatus { packing, outForDelivery, arrived }
 
 class OrderStatusTimelineWidget extends StatelessWidget {
   // Current status of the order
-  final DeliveryStatus currentStatus;
-
-  const OrderStatusTimelineWidget({super.key, required this.currentStatus});
+  final int? currentOrderId;
+  const OrderStatusTimelineWidget({super.key, this.currentOrderId});
 
   @override
   Widget build(BuildContext context) {
+    final DeliveryStatus currentStatus =
+        context.watch<OrderStatusTimelineCubit>().data;
+
+    context.read<OrderStatusTimelineCubit>().currentOrderId =
+        currentOrderId.toString();
+
+    Color getStatusColor(DeliveryStatus status) {
+      if (status == currentStatus) {
+        return Colors.green; // Current step
+      } else if (currentStatus.index > status.index) {
+        return Colors.green; // Completed step
+      } else {
+        return Colors.grey; // Inactive step
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -23,7 +38,7 @@ class OrderStatusTimelineWidget extends StatelessWidget {
           Row(
             children: [
               DotIndicator(
-                color: getStatusColor(DeliveryStatus.packing),
+                color: getStatusColor(DeliveryStatus.packingInProgress),
                 size: 12.0,
               ),
               const SizedBox(width: 8),
@@ -34,9 +49,10 @@ class OrderStatusTimelineWidget extends StatelessWidget {
           SizedBox(
             width: 24, // Set a fixed width for the line
             child: Divider(
-              color: currentStatus.index >= DeliveryStatus.outForDelivery.index
-                  ? Colors.red
-                  : Colors.grey,
+              color:
+                  currentStatus.index >= DeliveryStatus.deliveryInProgress.index
+                      ? Colors.red
+                      : Colors.grey,
               thickness: 2.5,
             ),
           ),
@@ -44,7 +60,7 @@ class OrderStatusTimelineWidget extends StatelessWidget {
           Row(
             children: [
               DotIndicator(
-                color: getStatusColor(DeliveryStatus.outForDelivery),
+                color: getStatusColor(DeliveryStatus.deliveryInProgress),
                 size: 12.0,
               ),
               const SizedBox(width: 8),
@@ -52,7 +68,7 @@ class OrderStatusTimelineWidget extends StatelessWidget {
                   .ds()
                   .bold(
                       returnBold: currentStatus.index >=
-                          DeliveryStatus.outForDelivery.index)
+                          DeliveryStatus.deliveryInProgress.index)
                   .fontSize(13)
             ],
           ),
@@ -60,7 +76,7 @@ class OrderStatusTimelineWidget extends StatelessWidget {
           SizedBox(
             width: 24, // Set a fixed width for the line
             child: Divider(
-              color: currentStatus.index >= DeliveryStatus.arrived.index
+              color: currentStatus.index >= DeliveryStatus.delivered.index
                   ? Colors.red
                   : Colors.grey,
               thickness: 2.5,
@@ -70,7 +86,7 @@ class OrderStatusTimelineWidget extends StatelessWidget {
           Row(
             children: [
               DotIndicator(
-                color: getStatusColor(DeliveryStatus.arrived),
+                color: getStatusColor(DeliveryStatus.delivered),
                 size: 12.0,
               ),
               const SizedBox(width: 8),
@@ -78,7 +94,7 @@ class OrderStatusTimelineWidget extends StatelessWidget {
                   .ds()
                   .bold(
                       returnBold:
-                          currentStatus.index >= DeliveryStatus.arrived.index)
+                          currentStatus.index >= DeliveryStatus.delivered.index)
                   .fontSize(13)
             ],
           ),
@@ -88,15 +104,6 @@ class OrderStatusTimelineWidget extends StatelessWidget {
   }
 
   // Helper function to determine the color of the dot based on the current status
-  Color getStatusColor(DeliveryStatus status) {
-    if (status == currentStatus) {
-      return Colors.green; // Current step
-    } else if (currentStatus.index > status.index) {
-      return Colors.green; // Completed step
-    } else {
-      return Colors.grey; // Inactive step
-    }
-  }
 }
 
 // void main() {

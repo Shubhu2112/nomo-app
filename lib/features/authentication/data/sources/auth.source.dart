@@ -5,5 +5,6 @@ abstract class AuthDataSource {
   Future<bool?> sendOtp(String? contactNum);
   Future<ApiResponse<UserModel?>> verifyOtp(String? contactNum, String? otp);
   Future<UserModel?> updateName(String? contactNum, String? name);
+  Future<UserModel?> updateFcmToken(String? fcmToken);
   Future<UserModel?> getUser();
 }

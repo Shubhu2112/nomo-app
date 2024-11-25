@@ -10,6 +10,7 @@ class UserModel with _$UserModel {
      String? id,
      String? contactNum,
      String? name,
+     String? fcmToken,
      CartModel? cart,
   }) = _UserModel;
 

@@ -3,7 +3,8 @@
     <application
         android:label="nomo_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
 
         <!-- Google Maps API Key -->
         <meta-data

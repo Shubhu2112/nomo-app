@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/views/injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/core/services/network_services/dio_http_impl.service.dart';
+import 'package:nomo_app/features/order/data/models/order.model.dart';
+import 'package:nomo_app/features/order/data/repositories/order_impl.repository.dart';
+import 'package:nomo_app/features/order/data/sources/order_impl.source.dart';
+import 'package:nomo_app/features/order/domain/order.usecase.dart';
+import 'package:nomo_app/features/order/presentation/cubits/order_status.cubit.dart';
 import 'package:nomo_app/features/order/presentation/views/order_summary.view.dart';
 import 'package:nomo_app/features/order/presentation/widgets/order_status_timeline.widget.dart';
 
@@ -12,9 +19,37 @@ class OrderStatusView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments is OrderModel
+        ? ModalRoute.of(context)!.settings.arguments as OrderModel
+        : null;
+    String? orderId = args?.id.toString();
+    return InjectableBaseView<OrderStatusCubit, OrderModel?>(
+      builder: (context, state) {
+        return OrderStatusViewContent(
+          orderModel: args ?? state.data,
+        );
+      },
+      listener: (context, state) => print(state),
+      cubitBuilder: (BuildContext context) => OrderStatusCubit(context,
+          orderUsecase: OrderUsecase(
+              repository: OrderImplRepository(
+                  dataSource:
+                      OrderImplDataSource(httpService: ApiRestService()))),
+          orderId: orderId,
+          order: args),
+    );
+  }
+}
+
+class OrderStatusViewContent extends StatelessWidget {
+  final OrderModel? orderModel;
+  const OrderStatusViewContent({super.key, this.orderModel});
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        searchWidget: Column(
+        titleWidget: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,8 +85,8 @@ class OrderStatusView extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 16),
                 child: Column(
                   children: [
-                    const OrderStatusTimelineWidget(
-                      currentStatus: DeliveryStatus.outForDelivery,
+                    OrderStatusTimelineWidget(
+                      currentOrderId: orderModel?.id,
                     ),
                     Container(
                       padding: const EdgeInsets.all(8),
@@ -110,13 +145,18 @@ class OrderStatusView extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CustomText(" 4 Items : Rs 100 Saved").dm().bold(),
+                              CustomText(
+                                      "${orderModel?.orderItems?.length} Items : Rs ${orderModel?.savings} Saved")
+                                  .dm()
+                                  .bold(),
                               TextButton(
                                   onPressed: () {
                                     NavigationService.goNext(
-                                        context, OrderSummaryView.routeName);
+                                        context, OrderSummaryView.routeName,
+                                        arg: orderModel);
                                   },
-                                  child: CustomText("Order Details >")
+                                  child: CustomText(
+                                          "Order Details (${orderModel?.id}) >")
                                       .dm()
                                       .textColor(
                                           Theme.of(context).primaryColor))
@@ -126,17 +166,17 @@ class OrderStatusView extends StatelessWidget {
                             thickness: 3,
                           ),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Icon(
                                 Icons.location_pin,
                               ),
                               CustomText("  Delivering To : ").dm().bold(),
-                              TextButton(
-                                  onPressed: () {},
-                                  child:
-                                      CustomText("B-003, Blue Pearl CHS, Malad")
-                                          .ds()
-                                          .maxLines(1))
+                              Flexible(
+                                child: CustomText(
+                                        "${orderModel?.address?.streetName1},${orderModel?.address?.streetName2},${orderModel?.address?.pincode}")
+                                    .ds(),
+                              )
                             ],
                           ),
                         ],

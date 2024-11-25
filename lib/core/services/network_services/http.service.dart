@@ -19,6 +19,7 @@ abstract class HttpService {
     Map<String, dynamic> queryParameters = const {},
     Params? params,
     ApiType? type,
+    bool useDataKey = true,
     Function({required String message})? onError,
   });
 

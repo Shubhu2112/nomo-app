@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 
-class CustomBottomAppbar extends StatelessWidget implements PreferredSizeWidget {
+class CustomBottomAppbar extends StatelessWidget
+    implements PreferredSizeWidget {
   final Widget? bottomWidget;
   final String? title;
   const CustomBottomAppbar({super.key, this.bottomWidget, this.title});
@@ -9,12 +10,12 @@ class CustomBottomAppbar extends StatelessWidget implements PreferredSizeWidget 
   @override
   Widget build(BuildContext context) {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(100),
+      preferredSize: preferredSize,
       child: AppBar(
         elevation: 8,
         toolbarHeight: 70,
-      // automaticallyImplyLeading: true,
-      // iconTheme: IconThemeData(color: Colors.black),
+        // automaticallyImplyLeading: true,
+        // iconTheme: IconThemeData(color: Colors.black),
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         surfaceTintColor: Theme.of(context).colorScheme.onPrimary,
         shape: const RoundedRectangleBorder(
@@ -24,15 +25,17 @@ class CustomBottomAppbar extends StatelessWidget implements PreferredSizeWidget 
           ),
         ),
         title: CustomText(title ?? "").db().bold(),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: Column(children: [
-            const Divider(
-              thickness: 2,
-            ),
-            bottomWidget ?? const Offstage()
-          ]),
-        ),
+        bottom: bottomWidget != null
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(50),
+                child: Column(children: [
+                  const Divider(
+                    thickness: 2,
+                  ),
+                  bottomWidget ?? const Offstage()
+                ]),
+              )
+            : null,
       ),
     );
   }

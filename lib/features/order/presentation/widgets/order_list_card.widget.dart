@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/data/extensions/date_time.extension.dart';
+import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
+import 'package:nomo_app/features/cart/presentation/cubit/cart.cubit.dart';
+import 'package:nomo_app/features/cart/presentation/view/cart.view.dart';
+import 'package:nomo_app/features/order/data/models/order.model.dart';
 import 'package:nomo_app/features/order/presentation/views/order_summary.view.dart';
 
 class OrderListCardWidget extends StatelessWidget {
-  const OrderListCardWidget({super.key});
+  final OrderModel? orderModel;
+  const OrderListCardWidget({super.key, this.orderModel});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +22,8 @@ class OrderListCardWidget extends StatelessWidget {
       padding: const EdgeInsets.all(4.0),
       child: InkWell(
         onTap: () {
-          NavigationService.goNext(context, OrderSummaryView.routeName);
+          NavigationService.goNext(context, OrderSummaryView.routeName,
+              arg: orderModel);
         },
         child: Card(
           child: Column(
@@ -38,17 +47,27 @@ class OrderListCardWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            CustomText("Order deilvered").db(),
+                            CustomText(
+                                    "Order ${orderModel?.deliveryDetail?.deliveryStatus}")
+                                .db(),
                             Row(
                               children: [
                                 CustomText(
-                                  "200",
+                                  orderModel?.totalAmount?.toString() ?? "",
                                   showCurrencySymbol: true,
                                 ).lm(),
-                                CustomText("•").dm(),
-                                CustomText(
-                                  "21 Aug, 5:15 PM",
-                                ).lm(),
+                                CustomText(" • ").dm(),
+                                CustomText((
+                                  // orderModel?.deliveryDetail
+                                  //               ?.deliveryStatus ==
+                                  //           "Delivered"
+                                  //       ? orderModel?.deliveryDateTime ?? ""
+                                  //       : 
+                                        orderModel
+                                                ?.deliveryDetail?.updatedTime?.toLocal()
+                                                .formatDateTime() ??
+                                            ""))
+                                    .lm(),
                               ],
                             )
                           ],
@@ -72,20 +91,41 @@ class OrderListCardWidget extends StatelessWidget {
                   height: 80,
                   child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: 3,
+                      itemCount: orderModel?.orderItems?.length,
                       // shrinkWrap: true,
                       padding: EdgeInsets.zero,
                       itemBuilder: (context, index) {
+                        CartItemModel? cartItem =
+                            orderModel?.orderItems?[index];
                         return Padding(
                           padding: const EdgeInsets.all(4.0),
-                          child: Card(
-                            elevation: 8,
-                            child: SvgPicture.asset(
-                              "apple".svg ?? "",
-                              width: 68,
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
+                          child: cartItem?.product?.image != null
+                              ? Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
+                                  ),
+                                  child: Image.network(
+                                    cartItem?.product?.image ?? "",
+                                    fit: BoxFit.fill,
+                                    height: 54,
+                                    width: 54,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
+                                  ),
+                                  child: SvgPicture.asset(
+                                    "apple".svg,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
                         );
 
                         // Padding(
@@ -116,7 +156,23 @@ class OrderListCardWidget extends StatelessWidget {
                     bottomLeft: Radius.circular(16),
                     bottomRight: Radius.circular(16)),
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    if (orderModel?.orderItems != null) {
+                      context.read<CartCubit>().cartState?.cartItems = [];
+                      await Future.forEach(orderModel!.orderItems!,
+                          (element) async {
+                        if (context.mounted) {
+                          context.read<CartCubit>().addProductToCartWithOption(
+                              element.product,
+                              productOptionValue: element.productOptionValue,
+                              quantity: element.quantity ?? 1);
+                        }
+                      });
+                    }
+                    if (context.mounted) {
+                      NavigationService.goNext(context, CartView.routeName);
+                    }
+                  },
                   child: Column(
                     children: [
                       const Divider(

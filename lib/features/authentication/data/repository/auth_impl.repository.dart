@@ -35,6 +35,18 @@ class AuthImplRepository implements AuthRepository {
     }
   }
 
+   @override
+  Future<UserModel?> updateFcmToken( String? fcmToken) async {
+    try {
+      UserModel? userModel = await _dataSource.updateFcmToken(fcmToken);
+
+      return userModel;
+    } on DioException catch (e) {
+      debugPrint(e.message);
+      return null;
+    }
+  }
+
   @override
   Future<ApiResponse<UserModel?>?> verifyOtp(
       String? contactNum, String? otp) async {

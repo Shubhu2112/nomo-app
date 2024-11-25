@@ -28,6 +28,7 @@ class AddToCartButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NonInjectableBaseWidget<CartCubit, CartState>(
+
       builder: (context, state) {
         final cartItems = context
                 .read<CartCubit>()
@@ -71,10 +72,7 @@ class AddToCartButtonWidget extends StatelessWidget {
                   if (productOptionValueModel != null) {
                     context.read<CartCubit>().addProductToCartWithOption(
                         productModel,
-                        optionValueId: productOptionValueModel?.id,
-                        maxRetailPrice: productOptionValueModel?.maxRetailPrice,
-                        optionName: productOptionValueModel?.name,
-                        sellingPrice: productOptionValueModel?.sellingPrice);
+                        productOptionValue: productOptionValueModel);
                   } else {
                     if (productModel?.productOptions?.isNotEmpty ?? false) {
                       ProductOptionsBottomSheet.bottomSheetMenu(
@@ -139,6 +137,9 @@ class AddToCartButtonWidget extends StatelessWidget {
                   },
                 ),
               );
+      },
+      errorBuilder: (context, state) {
+        return Text("eeoe");
       },
       listener: (context, state) => print(state),
     );

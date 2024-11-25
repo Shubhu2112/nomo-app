@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
-import 'package:nomo_app/core/presentation/views/injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/views/non_injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
-import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
 import 'package:nomo_app/features/categories/data/models/categories.model.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
 import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 import 'package:nomo_app/features/product/product_list/presentation/widgets/product_card.widget.dart';
+import 'package:nomo_app/features/store/data/models/store.model.dart';
 
 class HomeView extends StatelessWidget {
   final Function()? onProfileTap;
@@ -24,7 +22,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NonInjectableBaseView<HomeCubit,
-        (List<CategoryModel>?, List<ProductModel>?)>(
+        (List<CategoryModel>?, List<ProductModel>?, StoreModel?)>(
       bottomSafeArea: false,
       builder: (context, state) {
         return HomeViewContent(
@@ -32,6 +30,7 @@ class HomeView extends StatelessWidget {
           onProfileTap: onProfileTap,
           categories: state.data?.$1,
           bestSellingProducts: state.data?.$2,
+          store: state.data?.$3,
         );
       },
       listener: (context, state) => print(state),
@@ -44,12 +43,14 @@ class HomeViewContent extends StatelessWidget {
   final Function()? onCategoriesTap;
   final List<CategoryModel>? categories;
   final List<ProductModel>? bestSellingProducts;
+  final StoreModel? store;
   HomeViewContent(
       {super.key,
       this.onProfileTap,
       this.onCategoriesTap,
       this.categories,
-      this.bestSellingProducts});
+      this.bestSellingProducts,
+      this.store});
   final TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -78,7 +79,8 @@ class HomeViewContent extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CustomText("Delivery in just 10 Mins")
+                              CustomText(
+                                      "Delivery in just ${store?.travelTimeInMins} Mins")
                                   .db()
                                   .bold(),
                               InkWell(
@@ -91,7 +93,7 @@ class HomeViewContent extends StatelessWidget {
                                     const Icon(
                                       Icons.location_pin,
                                     ),
-                                    CustomText(" Kalyan, Thane - Mum").ds(),
+                                    CustomText(" ${store?.address}").ds(),
                                     Icon(
                                       Icons.keyboard_arrow_down,
                                       color: Theme.of(context)
@@ -153,21 +155,22 @@ class HomeViewContent extends StatelessWidget {
               ),
             ),
           ),
-
+          //TODO: add carousel
+          
           // Sliver for the carousel
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: CustomCarousel(
-                items: [
-                  Image.asset("carousel_1".png),
-                  Image.asset("carousel_2".png),
-                  Image.asset("carousel_2".png),
-                ],
-                aspectRatio: 2.1,
-              ),
-            ),
-          ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          //     child: CustomCarousel(
+          //       items: [
+          //         Image.asset("carousel_1".png),
+          //         Image.asset("carousel_2".png),
+          //         Image.asset("carousel_2".png),
+          //       ],
+          //       aspectRatio: 2.1,
+          //     ),
+          //   ),
+          // ),
 
           // Sliver for the Categories section
           SliverPadding(
@@ -230,8 +233,7 @@ class HomeViewContent extends StatelessWidget {
                 ProductModel? product = bestSellingProducts?[index];
                 return ProductCard(
                   isSubCategory: false,
-                 productModel: product,
-                
+                  productModel: product,
                 );
               },
             ),

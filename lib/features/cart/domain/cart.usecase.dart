@@ -1,36 +1,48 @@
+import 'package:nomo_app/features/cart/data/models/cart.model.dart';
 import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
+import 'package:nomo_app/features/cart/data/repositories/cart.repository.dart';
 
 class CartUsecase {
-static ({double priceTotal, double totalSavings, double maxRetailPriceTotal}) calculateCartTotal(
-    List<CartItemModel> cartItems) {
-  double priceTotal = 0;
-  double totalSavings = 0;
-  double maxRetailPriceTotal = 0;
+  final CartRepository _repository;
 
-  for (var item in cartItems) {
-    final itemQuantity = item.quantity ?? 1;
-    final maxRetailPrice = item.maxRetailPrice ?? 0;
-    final sellingPrice = item.price ?? 0;
+  CartUsecase({required CartRepository repository}) : _repository = repository;
+  static ({double priceTotal, double totalSavings, double maxRetailPriceTotal})
+      calculateCartTotal(List<CartItemModel> cartItems) {
+    double priceTotal = 0;
+    double totalSavings = 0;
+    double maxRetailPriceTotal = 0;
 
-    // Calculate total selling price for this item
-    priceTotal += sellingPrice * itemQuantity;
+    for (var item in cartItems) {
+      final itemQuantity = item.quantity ?? 1;
+      final maxRetailPrice = item.product?.maxRetailPrice ??
+          item.productOptionValue?.maxRetailPrice ??
+          0;
+      final sellingPrice = item.product?.sellingPrice ??
+          item.productOptionValue?.sellingPrice ??
+          0;
 
-    // Calculate total savings for this item
-    totalSavings += (maxRetailPrice - sellingPrice) * itemQuantity;
+      // Calculate total selling price for this item
+      priceTotal += sellingPrice * itemQuantity;
 
-    // Calculate total max retail price for this item
-    maxRetailPriceTotal += maxRetailPrice * itemQuantity;
+      // Calculate total savings for this item
+      totalSavings += (maxRetailPrice - sellingPrice) * itemQuantity;
+
+      // Calculate total max retail price for this item
+      maxRetailPriceTotal += maxRetailPrice * itemQuantity;
+    }
+
+    print("Total Selling Price: $priceTotal");
+    print("Total Savings: $totalSavings");
+    print("Total Max Retail Price: $maxRetailPriceTotal");
+
+    return (
+      priceTotal: priceTotal,
+      totalSavings: totalSavings,
+      maxRetailPriceTotal: maxRetailPriceTotal,
+    );
   }
 
-  print("Total Selling Price: $priceTotal");
-  print("Total Savings: $totalSavings");
-  print("Total Max Retail Price: $maxRetailPriceTotal");
-
-  return (
-    priceTotal: priceTotal,
-    totalSavings: totalSavings,
-    maxRetailPriceTotal: maxRetailPriceTotal,
-  );
-}
-
+  Future<CartModel?> checkout(CartModel? cart) async {
+    return await _repository.checkout(cart);
+  }
 }

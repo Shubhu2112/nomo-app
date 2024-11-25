@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:nomo_app/core/data/extensions/date_time.extension.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_bottom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
+import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_card.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_item.widget.dart';
+import 'package:nomo_app/features/order/data/models/order.model.dart';
 import 'package:nomo_app/features/order/presentation/widgets/order_details_item.widget.dart';
 import 'package:nomo_app/features/order/presentation/widgets/order_summary_card.widget.dart';
 
@@ -11,18 +15,24 @@ class OrderSummaryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orderModel = ModalRoute.of(context)!.settings.arguments is OrderModel
+        ? ModalRoute.of(context)!.settings.arguments as OrderModel
+        : null;
     return Scaffold(
       appBar: CustomBottomAppbar(
         title: "Order Summary",
         bottomWidget: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 2),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomText("5 items delivered").db().bold(),
               CustomText(
-                "Arrived at 5:15 PM",
+                      "${orderModel?.orderItems?.length} items ${orderModel?.deliveryDetail?.deliveryStatus}")
+                  .db()
+                  .bold(),
+              CustomText(
+                "${orderModel?.deliveryDetail?.deliveryStatus} at  ${orderModel?.deliveryDetail?.updatedTime?.toLocal().formatDateTime() ?? ""}",
               ).lm().overflow(TextOverflow.ellipsis).maxLines(1)
             ],
           ),
@@ -43,41 +53,28 @@ class OrderSummaryView extends StatelessWidget {
                       true, // Allows ListView to shrink to the height of its content
                   physics:
                       const NeverScrollableScrollPhysics(), // Prevents it from scrolling separately
-                  itemCount: 5, // Number of items
+                  itemCount: orderModel?.orderItems?.length, // Number of items
                   itemBuilder: (context, index) {
-                    return const OrderSummaryCardWidget();
+                    CartItemModel? orderItem = orderModel?.orderItems?[index];
+                    return OrderSummaryCardWidget(
+                      cartItem: orderItem,
+                    );
                   },
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CustomText("Bill Summary").db().bold(),
-                  Card(
-                    color: Theme.of(context).primaryColor.withOpacity(0.33),
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(children: [
-                        BillSummaryItemWidget(title: "MRP Total", value: 140),
-                        BillSummaryItemWidget(title: "GST (18%)", value: 0),
-                        BillSummaryItemWidget(
-                            title: "Items Savings", value: 40),
-                        BillSummaryItemWidget(title: "Delivery Fee", value: 0),
-                        SizedBox(height: 4),
-                        Divider(thickness: 2),
-                        SizedBox(height: 6),
-                        BillSummaryItemWidget(title: "To Pay", value: 100),
-                      ]),
-                    ),
-                  ),
-                ],
+              child: BillSummaryCardWidget(
+                maxRetailPriceTotal: orderModel?.totalMRP,
+                totalSavings: orderModel?.savings,
+                total: orderModel?.totalAmount,
+                isOrderDetails: true,
               ),
             ),
             Container(
               color: Theme.of(context).colorScheme.surface,
+              width: double.infinity,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -86,18 +83,18 @@ class OrderSummaryView extends StatelessWidget {
                   children: [
                     CustomText("Order Details").db().bold(),
                     const SizedBox(height: 4),
-                    const OrderDetailsItemWidget(
+                    OrderDetailsItemWidget(
                       title: "Order id",
-                      value: "ORD123456789",
+                      value: "ORD${orderModel?.id}",
                     ),
                     const OrderDetailsItemWidget(
                       title: "Payment",
                       value: "Paid Online",
                     ),
-                    const OrderDetailsItemWidget(
+                    OrderDetailsItemWidget(
                       title: "Deliver to",
                       value:
-                          "Ishika Gupta, B-94 basant vihar colony, Indore (M.P)",
+                          "${orderModel?.address?.name}, ${orderModel?.address?.streetName1}, ${orderModel?.address?.streetName2}",
                     ),
                     const SizedBox(height: 6),
                   ],

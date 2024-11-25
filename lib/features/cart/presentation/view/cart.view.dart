@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/views/non_injectable_base.widget.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_bottom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
@@ -10,30 +11,80 @@ import 'package:nomo_app/features/address/data/models/address.model.dart';
 import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
 import 'package:nomo_app/features/address/presentation/view/add_address.view.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
-import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
 import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
-import 'package:nomo_app/features/cart/domain/cart.useCase.dart';
+import 'package:nomo_app/features/cart/domain/cart.usecase.dart';
 import 'package:nomo_app/features/cart/presentation/cubit/cart.cubit.dart';
 import 'package:nomo_app/features/cart/presentation/cubit/state/cart.state.dart';
+import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_card.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_item.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/gradient_offer_card.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/product_cart_card.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/product_options_cart_card.widget.dart';
+import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
 import 'package:nomo_app/features/dashboard/presentation/view/dashboard.view.dart';
 import 'package:nomo_app/features/order/presentation/views/order_status.view.dart';
 import 'package:nomo_app/features/order/presentation/widgets/order_success.widget.dart';
-import 'package:nomo_app/features/product/product_details/presentation/widgets/product_option_card.widget.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product_option_value.model.dart';
 
 class CartView extends StatelessWidget {
   static String routeName = "/cart_view";
-
   const CartView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    CartState? cartState = context.watch<CartCubit>().cartState;
+    return NonInjectableBaseWidget<CartCubit, CartState>(
+      resetStateOnPop: true,
+      builder: (context, state) {
+        if (state is EmptyCartState) {
+          return Scaffold(
+            appBar: const CustomBottomAppbar(
+              title: "Your Cart",
+            ),
+            body: Center(
+              child: CustomText(state.message ?? "").db(),
+            ),
+          );
+        }
+        return CartContent(
+          cartState: state.data,
+        );
+      },
+      listener: (context, state) {
+        if (state is OrderPlaceState) {
+          SharedUi.showCustomDialog(context, child: const OrderSuccessWidget());
+          Future.delayed(
+            const Duration(milliseconds: 1400),
+            () {
+              if (context.mounted) {
+                NavigationService.goNext(context, OrderStatusView.routeName,
+                    arg: state.data?.orderModel);
+              }
+            },
+          );
+        }
+      },
+      loadingBuilder: (context, state) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator.adaptive()),
+        );
+      },
+      init: (cubit) {
+        cubit.checkout();
+      },
+    );
+  }
+}
+
+class CartContent extends StatelessWidget {
+  static String routeName = "/cart_view";
+
+  final CartState? cartState;
+
+  const CartContent({super.key, this.cartState});
+
+  @override
+  Widget build(BuildContext context) {
     ({
       double maxRetailPriceTotal,
       double priceTotal,
@@ -57,17 +108,9 @@ class CartView extends StatelessWidget {
             if (selectedAddressModel == null) {
               NavigationService.goNext(context, AddAddressView.routeName);
             } else {
-              SharedUi.showCustomDialog(context,
-                  child: const OrderSuccessWidget());
-              Future.delayed(
-                const Duration(milliseconds: 1400),
-                () {
-                  if (context.mounted) {
-                    NavigationService.goNext(
-                        context, OrderStatusView.routeName);
-                  }
-                },
-              );
+              context
+                  .read<CartCubit>()
+                  .placeOrder(selectedAddressModel.id ?? 0);
             }
           },
         ),
@@ -85,7 +128,7 @@ class CartView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CustomText("Ordering for Sagar").db().bold(),
+                    CustomText("Ordering for ${context.read<HomeCubit>().userModel?.name ?? ""}").db().bold(),
                     if (selectedAddressModel?.streetName1 != null)
                       InkWell(
                         onTap: () {
@@ -173,33 +216,37 @@ class CartView extends StatelessWidget {
                           CartItemModel? cartItemModel =
                               cartState?.cartItems[index];
 
-                          if (cartItemModel?.productOptionValueId == 0) {
+                          if (cartItemModel?.productOptionValueId == null) {
                             return ProductCartCard(
-                              productModel: ProductModel(
-                                  id: cartItemModel?.productId,
-                                  maxRetailPrice: cartItemModel?.maxRetailPrice,
-                                  sellingPrice: cartItemModel?.price,
-                                  image: cartItemModel?.image,
-                                  name: cartItemModel?.name,
-                                  unit: cartItemModel?.unit),
+                              productModel: cartItemModel?.product,
+                              // productModel: ProductModel(
+                              //     id: cartItemModel?.productId,
+                              //     maxRetailPrice: cartItemModel?.maxRetailPrice,
+                              //     sellingPrice: cartItemModel?.price,
+                              //     image: cartItemModel?.image,
+                              //     name: cartItemModel?.name,
+                              //     unit: cartItemModel?.unit),
                             );
                           } else {
                             return ProductOptionCartCard(
-                              productModel: ProductModel(
-                                  id: cartItemModel?.productId,
-                                  maxRetailPrice: cartItemModel?.maxRetailPrice,
-                                  sellingPrice: cartItemModel?.price,
-                                  image: cartItemModel?.image,
-                                  name: cartItemModel?.name,
-                                  unit: cartItemModel?.unit),
-                              productOptionValueModel: ProductOptionValueModel(
-                                  id: cartItemModel?.productOptionValueId,
-                                  maxRetailPrice: cartItemModel?.maxRetailPrice,
-                                  sellingPrice: cartItemModel?.price,
-                                  productsId: cartItemModel?.productId,
-                                  image: cartItemModel?.image,
-                                  name: cartItemModel?.name,
-                                  unit: cartItemModel?.unit),
+                              productModel: cartItemModel?.product,
+                              productOptionValueModel:
+                                  cartItemModel?.productOptionValue,
+                              // productModel: ProductModel(
+                              //     id: cartItemModel?.productId,
+                              //     maxRetailPrice: cartItemModel?.maxRetailPrice,
+                              //     sellingPrice: cartItemModel?.price,
+                              //     image: cartItemModel?.image,
+                              //     name: cartItemModel?.name,
+                              //     unit: cartItemModel?.unit),
+                              // productOptionValueModel: ProductOptionValueModel(
+                              //     id: cartItemModel?.productOptionValueId,
+                              //     maxRetailPrice: cartItemModel?.maxRetailPrice,
+                              //     sellingPrice: cartItemModel?.price,
+                              //     productsId: cartItemModel?.productId,
+                              //     image: cartItemModel?.image,
+                              //     name: cartItemModel?.name,
+                              //     unit: cartItemModel?.unit),
                             );
                           }
                         },
@@ -239,31 +286,10 @@ class CartView extends StatelessWidget {
               const SizedBox(
                 height: 6,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: CustomText("Bill Summary").db().bold(),
-              ),
-              Card(
-                elevation: 6,
-                color: const Color(0xffF4E2E4),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(children: [
-                    BillSummaryItemWidget(
-                        title: "MRP Total",
-                        value: cartAmount.maxRetailPriceTotal),
-                    const BillSummaryItemWidget(title: "GST (18%)", value: 0),
-                    BillSummaryItemWidget(
-                        title: "Items Savings", value: cartAmount.totalSavings),
-                    const BillSummaryItemWidget(
-                        title: "Delivery Fee", value: 0),
-                    const SizedBox(height: 4),
-                    const Divider(thickness: 2),
-                    const SizedBox(height: 6),
-                    BillSummaryItemWidget(
-                        title: "To Pay", value: cartAmount.priceTotal),
-                  ]),
-                ),
+              BillSummaryCardWidget(
+                maxRetailPriceTotal: cartAmount.maxRetailPriceTotal,
+                totalSavings: cartAmount.totalSavings,
+                total: cartAmount.priceTotal,
               ),
               const SizedBox(
                 height: 6,

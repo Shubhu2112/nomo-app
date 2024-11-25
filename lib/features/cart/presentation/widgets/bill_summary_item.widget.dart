@@ -13,7 +13,7 @@ class BillSummaryItemWidget extends StatelessWidget {
       children: [
         CustomText(title ?? "").db(),
         CustomText(
-          value?.toString() ?? "",
+          value?.toString() ?? "0",
           showCurrencySymbol: true,
         ).db().left(),
       ],

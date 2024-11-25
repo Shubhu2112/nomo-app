@@ -47,6 +47,24 @@ class AuthImplDataSource implements AuthDataSource {
     return response;
   }
 
+   @override
+  Future<UserModel?> updateFcmToken( String? fcmToken) async {
+    final apiResponse = await _httpService.handlePostRequest(
+      ApiConstants.updateFcmToken,
+      { "fcmToken": fcmToken},
+      isPublic: false,
+    );
+
+    UserModel? response;
+    try {
+      response = UserModel.fromJson(apiResponse?.data ?? {});
+    } catch (e) {
+      rethrow;
+    }
+
+    return response;
+  }
+
   @override
   Future<ApiResponse<UserModel?>> verifyOtp(
       String? contactNum, String? otp) async {
@@ -84,7 +102,7 @@ class AuthImplDataSource implements AuthDataSource {
 
     UserModel? response;
     try {
-      response = UserModel.fromJson(apiResponse?.data ?? {});
+      response = UserModel.fromJson(apiResponse?.data?["data"] ?? {});
     } catch (e) {
       rethrow;
     }

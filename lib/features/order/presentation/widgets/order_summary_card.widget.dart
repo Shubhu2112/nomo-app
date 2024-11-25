@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
 
 class OrderSummaryCardWidget extends StatelessWidget {
-  final double? maxRetailPrice;
-  final double? sellingPrice;
-  final String? productName;
-  final String? productOptionName;
-  final String? productOptionValueName;
-  final String? productImg;
-  final String? productDescription;
+  final CartItemModel? cartItem;
   final bool isProductCard;
+
   const OrderSummaryCardWidget({
     super.key,
-    this.maxRetailPrice = 90,
-    this.productName = "Apple",
-    this.productOptionName = "Select Unit",
-    this.productOptionValueName = "1Kg",
-    this.sellingPrice = 42,
-    this.productImg,
-    this.productDescription =
-        "Apples are nutritious. Apples may be good for weight loss. apples may be good for your heart. As part of a healtful and varied diet.",
+    required this.cartItem,
     this.isProductCard = false,
   });
 
@@ -35,11 +24,31 @@ class OrderSummaryCardWidget extends StatelessWidget {
             padding: const EdgeInsets.all(4.0),
             child: Card(
               elevation: 8,
-              child: SvgPicture.asset(
-                "apple".svg ?? "",
-                width: 68,
-                fit: BoxFit.scaleDown,
-              ),
+              child: cartItem?.product?.image != null
+                  ? Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                      child: Image.network(
+                        cartItem?.product?.image ?? "",
+                        fit: BoxFit.fill,
+                        height: 44,
+                        width: 40,
+                      ),
+                    )
+                  : Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                      child: SvgPicture.asset(
+                        "apple".svg,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
             ),
           ),
           Expanded(
@@ -47,19 +56,20 @@ class OrderSummaryCardWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.max,
               children: [
-                CustomText(productName ?? "").db(),
+                CustomText(cartItem?.product?.name ?? "").db(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    CustomText(productOptionValueName ?? "").lm(),
+                    CustomText(cartItem?.product?.unit ??
+                            cartItem?.productOptionValue?.name ??
+                            "")
+                        .lm(),
                     Row(
                       children: [
-                        CustomText("₹$sellingPrice").dm().bold(),
-                        const SizedBox(
-                          width: 6,
-                        ),
-                        CustomText("₹$maxRetailPrice")
+                        CustomText("₹${cartItem?.price ?? 0}").dm().bold(),
+                        const SizedBox(width: 6),
+                        CustomText("₹${cartItem?.maxRetailPrice ?? 0}")
                             .decoration(TextDecoration.lineThrough)
                             .fontSize(12),
                       ],
@@ -68,7 +78,7 @@ class OrderSummaryCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

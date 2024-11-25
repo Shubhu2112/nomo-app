@@ -52,7 +52,7 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   void initState() {
     super.initState();
-    context.read<AddressListCubit>();
+    context.read<AddressListCubit>().init();
     // Initialize _pages here after the state is fully initialized
     _pages = [
       HomeView(

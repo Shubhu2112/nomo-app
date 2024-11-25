@@ -29,6 +29,7 @@ class ApiConstants {
   static const String sendOtp = "/otp/send";
   static const String verifyOtp = "/auth/verify-otp";
   static const String updateUserName = "/auth/update-name";
+  static const String updateFcmToken = "/auth/update-fcm-token";
   static const String getUser = "/auth/me";
   static const String addresses = "/address";
 
@@ -36,4 +37,9 @@ class ApiConstants {
   static const String subCategories = '/sub-category';
   static const String products = '/products';
   static const String metalPrice = '/products/rates';
+  static const String storeNearby = '/stores/nearby';
+
+  static const String cartCheckout = '/cart/cart-checkout';
+  static const String placeOrder = '/order/place-order';
+  static const String getOrder = '/order';
 }

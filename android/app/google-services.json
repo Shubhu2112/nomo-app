@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "289124361110",
+    "project_id": "nomo-b4485",
+    "storage_bucket": "nomo-b4485.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289124361110:android:3d5bd88b655688cf7073b7",
+        "android_client_info": {
+          "package_name": "com.example.nomoApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFLEGeHvqLgD0hoJbHMwpYpN_w8adYu7U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

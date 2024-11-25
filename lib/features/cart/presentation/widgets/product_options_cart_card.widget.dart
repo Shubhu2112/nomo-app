@@ -11,11 +11,11 @@ class ProductOptionCartCard extends StatelessWidget {
   final ProductOptionValueModel? productOptionValueModel;
   final ProductModel? productModel;
 
-  const ProductOptionCartCard({
-    super.key,
-    this.productOptionValueModel,
-    this.productModel,
-  });
+  const ProductOptionCartCard(
+      {super.key,
+      this.productOptionValueModel,
+      this.productModel,
+});
 
   @override
   Widget build(BuildContext context) {
@@ -64,12 +64,16 @@ class ProductOptionCartCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        CustomText(productOptionValueModel?.name ?? "")
+                        CustomText( productModel?.name ?? ""
+                                )
                             .db()
                             .maxLines(2)
-                            .height(1.1).overflow(TextOverflow.ellipsis),
+                            .height(1.1)
+                            .overflow(TextOverflow.ellipsis),
                         const SizedBox(height: 1),
-                        CustomText(productOptionValueModel?.unit ?? "").lm(),
+                        CustomText( productOptionValueModel?.name ?? ""
+                                )
+                            .lm(),
                       ],
                     ),
                   ),

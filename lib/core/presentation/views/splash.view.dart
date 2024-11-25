@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
 import 'package:nomo_app/core/services/cookie_services/cookie.service.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/core/services/network_services/dio_http_impl.service.dart';
+import 'package:nomo_app/core/services/network_services/http.service.dart';
+import 'package:nomo_app/core/services/notification_services/notification.service.dart';
+import 'package:nomo_app/features/authentication/data/models/user.model.dart';
+import 'package:nomo_app/features/authentication/data/repository/auth_impl.repository.dart';
+import 'package:nomo_app/features/authentication/data/sources/auth_impl.source.dart';
+import 'package:nomo_app/features/authentication/domain/usecase/auth.usecase.dart';
 import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
 import 'package:nomo_app/features/dashboard/presentation/view/dashboard.view.dart';
 
@@ -24,7 +31,7 @@ class _SplashViewState extends State<SplashView>
       false; // Toggle to fill the screen with the desired color
 
   @override
-  void initState() {
+  initState() {
     super.initState();
 
     // Initialize the animation controller for fade and scale animations
@@ -63,13 +70,32 @@ class _SplashViewState extends State<SplashView>
     });
 
     // Navigate to the next screen after 2 seconds
-    Future.delayed(const Duration(seconds: 2), () async {
-      // You can navigate to the next screen here
 
-      String? accessToken = await CookieService.retrieveData('token');
+    // You can navigate to the next screen here
+    _initializeAsyncOperations();
+  }
+
+  Future<void> _initializeAsyncOperations() async {
+    // Retrieve access token
+    String? accessToken = await CookieService.retrieveData('token');
+
+    // Use AuthUsecase to get user and update FCM token if necessary
+    AuthUsecase authUsecase = AuthUsecase(
+        repository: AuthImplRepository(
+            dataSource: AuthImplDataSource(httpService: ApiRestService())));
+    UserModel? user = await authUsecase.getUser();
+
+    // if (user?.fcmToken == null) {
+      String? fcmToken = await NotificationService.getToken();
+      await authUsecase.updateFcmToken(fcmToken);
+    // }
+
+    // Navigate to the next screen after a delay
+    Future.delayed(Duration(seconds: user?.fcmToken != null ? 1 : 0), () {
       if (mounted) {
         if (accessToken != null) {
-          NavigationService.goNextFinishAll(context, DashboardView.routeName);
+          NavigationService.goNextFinishAll(context, DashboardView.routeName,
+              arg: user?.id != null ? user : null);
         } else {
           NavigationService.goNextFinishAll(context, OtpView.routeName);
         }

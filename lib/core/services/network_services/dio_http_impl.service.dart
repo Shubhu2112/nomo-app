@@ -63,6 +63,7 @@ class ApiRestService implements HttpService {
     Map<String, dynamic> queryParameters = const {},
     ApiType? type,
     Params? params,
+    bool useDataKey = true,
     Function({required String message})? onError,
   }) async {
     try {
@@ -76,8 +77,10 @@ class ApiRestService implements HttpService {
       );
 
       List<Map<String, dynamic>> apiResponse =
-          (response.data != null && response.data['data'] is List)
-              ? List<Map<String, dynamic>>.from(response.data['data'])
+          (((useDataKey && response.data['data'] is List) ||
+                  (!useDataKey && response.data is List)))
+              ? List<Map<String, dynamic>>.from(
+                  useDataKey ? response.data['data'] : response.data)
               : [];
 
       return ApiResponse(data: apiResponse);

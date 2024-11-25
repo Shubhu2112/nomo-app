@@ -55,6 +55,12 @@ class AddressListCubit extends BaseCubit<List<AddressModel>?> {
     selectedAddress = address;
     emit(BaseCompletedState(data: data));
   }
+@override
+  FutureOr<void> clearData() {
+    addresses = null;
+    selectedAddress = null;
+  }
+
 
   @override
   List<AddressModel>? get data => addresses;

@@ -5,21 +5,21 @@ import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart'
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String? title;
+  // final String? title;
   final String? searchHint;
   final Function(String search)? onSearch;
   final VoidCallback? onBackPress;
   final bool showBackButton;
-  final Widget? searchWidget;
+  final Widget? titleWidget;
 
   CustomAppBar(
       {super.key,
-      this.title,
+      // this.title,
       this.searchHint,
       this.onBackPress,
       this.onSearch,
       this.showBackButton = false,
-      this.searchWidget});
+      this.titleWidget});
 
   final TextEditingController searchController = TextEditingController();
 
@@ -49,7 +49,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         color: Theme.of(context).colorScheme.onSecondary,
                       )),
                 Expanded(
-                  child: searchWidget ??
+                  child: titleWidget ??
                       CustomTextField(
                         controller: searchController,
                         hintText: searchHint ?? "Search Namkeen",

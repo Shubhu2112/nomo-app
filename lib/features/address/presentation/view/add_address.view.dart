@@ -9,6 +9,7 @@ import 'package:google_places_flutter/model/prediction.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/core/services/location_services/location_service.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/features/address/presentation/cubit/add_address.cubit.dart';
 import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
@@ -45,21 +46,16 @@ class _AddAddressViewState extends State<AddAddressView> {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return;
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) return;
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) return;
+    if (mounted) {
+      Position? currentPosition =
+          await LocationService.getCurrentPosition(context);
+      setState(() {
+        _center = LatLng(currentPosition?.latitude ?? 0.0,
+            currentPosition?.longitude ?? 0.0);
+        _currentMapPosition = _center;
+        _getAddressFromLatLng(_center!);
+      });
     }
-
-    Position currentPosition = await Geolocator.getCurrentPosition();
-    setState(() {
-      _center = LatLng(currentPosition.latitude, currentPosition.longitude);
-      _currentMapPosition = _center;
-      _getAddressFromLatLng(_center!);
-    });
   }
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
@@ -158,7 +154,7 @@ class _AddAddressViewState extends State<AddAddressView> {
         ],
       ),
       appBar: CustomAppBar(
-        searchWidget: Column(
+        titleWidget: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
             const SizedBox(height: 8),

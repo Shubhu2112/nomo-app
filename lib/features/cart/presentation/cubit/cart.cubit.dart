@@ -1,22 +1,27 @@
 import 'dart:async';
-
-import 'package:nomo_app/core/common/parser/query_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.state.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/features/cart/data/models/cart.model.dart';
 import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
+import 'package:nomo_app/features/cart/domain/cart.usecase.dart';
 import 'package:nomo_app/features/cart/presentation/cubit/state/cart.state.dart';
+import 'package:nomo_app/features/order/data/models/order.model.dart';
+import 'package:nomo_app/features/order/domain/order.usecase.dart';
+import 'package:nomo_app/features/order/presentation/views/order_status.view.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
-import 'package:nomo_app/features/product/product_list/domain/product_list.usecase.dart';
+import 'package:nomo_app/features/product/product_list/data/models/product_option_value.model.dart';
 
 class CartCubit extends BaseCubit<CartState> {
   CartCubit(
-    super.context,
-    // {
-    // required this.productListUsecase,
-    // }
-  );
+    super.context, {
+    required this.cartUsecase,
+    required this.orderUsecase,
+  });
 
-  // final ProductListUsecase productListUsecase;
+  final CartUsecase cartUsecase;
+  final OrderUsecase orderUsecase;
 
   CartState? cartState;
 
@@ -87,17 +92,19 @@ class CartCubit extends BaseCubit<CartState> {
   }
 
   // Add product to the cart, with or without options
-  void  addProductToCartWithOption(ProductModel? product,
-      {int? optionValueId, double? maxRetailPrice, double? sellingPrice,String? optionName}) {
+  void addProductToCartWithOption(ProductModel? product,
+      {ProductOptionValueModel? productOptionValue, int quantity = 1 }) {
     final cartItem = CartItemModel(
       productId: product?.id ?? 0,
-      productOptionValueId: optionValueId ?? 0,
-      maxRetailPrice: product?.maxRetailPrice ?? maxRetailPrice,
-      unit: product?.unit??optionName,
-      name: product?.name,
-      image: product?.image,
-      price: product?.sellingPrice ?? sellingPrice,
-      quantity: 1, // Default quantity is 1
+      productOptionValueId: productOptionValue?.id,
+      product: product,
+      productOptionValue: productOptionValue,
+      // maxRetailPrice: product?.maxRetailPrice ?? maxRetailPrice,
+      // unit: product?.unit ?? optionName,
+      // name: product?.name,
+      // image: product?.image,
+      // price: product?.sellingPrice ?? sellingPrice,
+      quantity: quantity, // Default quantity is 1
       // productModel: product,
     );
     cartState?.cartItems.add(cartItem);
@@ -110,23 +117,23 @@ class CartCubit extends BaseCubit<CartState> {
   }
 
   // Update cart based on whether the product has options or not
-  void updateCartStateWithOption(ProductModel product, {int? optionValueId}) {
-    final existingItem = cartState?.cartItems.firstWhere(
-      (item) =>
-          item.productId == product.id &&
-          (item.productOptionValueId == optionValueId || optionValueId == null),
-      orElse: () => CartItemModel(),
-    );
+  // void updateCartStateWithOption(ProductModel product, {int? optionValueId}) {
+  //   final existingItem = cartState?.cartItems.firstWhere(
+  //     (item) =>
+  //         item.productId == product.id &&
+  //         (item.productOptionValueId == optionValueId || optionValueId == null),
+  //     orElse: () => CartItemModel(),
+  //   );
 
-    if (existingItem?.productId != null) {
-      // If the product with or without option is already in the cart, increase its quantity
-      incrementQuantityWithOption(product.id ?? 0,
-          optionValueId: optionValueId);
-    } else {
-      // If the product is not in the cart, add it
-      addProductToCartWithOption(product, optionValueId: optionValueId);
-    }
-  }
+  //   if (existingItem?.productId != null) {
+  //     // If the product with or without option is already in the cart, increase its quantity
+  //     incrementQuantityWithOption(product.id ?? 0,
+  //         optionValueId: optionValueId);
+  //   } else {
+  //     // If the product is not in the cart, add it
+  //     addProductToCartWithOption(product, optionValueId: optionValueId);
+  //   }
+  // }
 
   void removeProductFromCartWithOption(int? productId, {int? optionValueId}) {
     cartState?.cartItems.removeWhere((item) =>
@@ -165,11 +172,37 @@ class CartCubit extends BaseCubit<CartState> {
   //   emit(BaseCompletedState(data: data));
   // }
 
+  checkout() async {
+    isLoading = true;
+    emit(const BaseLoadingState());
+    if (cartState?.cartItems.isNotEmpty?? false) {
+      CartModel? cartModel = await cartUsecase.checkout(
+          CartModel(storeId: 1, cartItems: cartState?.cartItems ?? []));
+      cartState?.cartItems = [];
+      cartState?.cartItems.addAll(cartModel?.cartItems ?? []);
+      isLoading = false;
+      emit(BaseCompletedState(data: data));
+    }else{
+      emit(EmptyCartState(data: data,message: "Your cart is empty"));
+    }
+  }
+
+  placeOrder(int addressId) async {
+    OrderModel? orderModel = await orderUsecase.placeOrder(CartModel(
+        storeId: 1,
+        addressId: addressId,
+        cartItems: cartState?.cartItems ?? []));
+    cartState?.orderModel = orderModel;
+    if (orderModel != null) {
+      emit(OrderPlaceState(data: data));
+    }
+  }
+
   @override
   FutureOr<void> init() async {
     if (state is! BaseLoadingState) emit(const BaseLoadingState());
     // await fetchProducts(subCategoryId!);
-    cartState = CartState([]);
+    cartState = CartState([], null);
     if (!isDisposed) {
       emit(BaseCompletedState(data: data));
     }
