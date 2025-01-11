@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/dialogs/common_dialogs.dart';
 import 'package:nomo_app/core/presentation/views/non_injectable_base.widget.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_bottom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
@@ -17,6 +19,7 @@ import 'package:nomo_app/features/cart/presentation/cubit/cart.cubit.dart';
 import 'package:nomo_app/features/cart/presentation/cubit/state/cart.state.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_card.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/bill_summary_item.widget.dart';
+import 'package:nomo_app/features/cart/presentation/widgets/cart_shimmer.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/gradient_offer_card.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/product_cart_card.widget.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/product_options_cart_card.widget.dart';
@@ -65,9 +68,7 @@ class CartView extends StatelessWidget {
         }
       },
       loadingBuilder: (context, state) {
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator.adaptive()),
-        );
+        return const CartShimmer();
       },
       init: (cubit) {
         cubit.checkout();
@@ -108,6 +109,11 @@ class CartContent extends StatelessWidget {
             if (selectedAddressModel == null) {
               NavigationService.goNext(context, AddAddressView.routeName);
             } else {
+              DialogBox.loadingDialog(
+                context,
+                Lottie.asset("groceries_loading".anm,
+                    fit: BoxFit.cover, height: 248),
+              );
               context
                   .read<CartCubit>()
                   .placeOrder(selectedAddressModel.id ?? 0);
@@ -128,7 +134,10 @@ class CartContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CustomText("Ordering for ${context.read<HomeCubit>().userModel?.name ?? ""}").db().bold(),
+                    CustomText(
+                            "Ordering for ${context.read<HomeCubit>().userModel?.name ?? ""}")
+                        .db()
+                        .bold(),
                     if (selectedAddressModel?.streetName1 != null)
                       InkWell(
                         onTap: () {

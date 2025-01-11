@@ -3,6 +3,7 @@ import 'package:nomo_app/core/presentation/views/non_injectable_base.view.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 import 'package:nomo_app/features/product/product_list/presentation/cubit/product_list.cubit.dart';
 import 'package:nomo_app/features/product/product_list/presentation/widgets/product_card.widget.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductListView extends StatelessWidget {
   final String? subCategoryId;
@@ -16,6 +17,16 @@ class ProductListView extends StatelessWidget {
         return ProductListContent(
           productList: state.data,
         );
+      },
+      loadingbuilder: (context, state) {
+        return Shimmer.fromColors(
+            baseColor: Colors.grey,
+            highlightColor: Colors.white,
+            child: Container(
+              color: Colors.red,
+              height: 20,
+              width: 20,
+            ));
       },
       listener: (context, state) => print(state),
     );
@@ -37,7 +48,7 @@ class ProductListContent extends StatelessWidget {
         itemBuilder: (context, index) {
           ProductModel? product = productList?[index];
           return ProductCard(
-           productModel: product,
+            productModel: product,
           );
         },
       ),

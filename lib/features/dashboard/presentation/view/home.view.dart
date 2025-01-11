@@ -9,6 +9,7 @@ import 'package:nomo_app/features/address/presentation/view/address_list.view.da
 import 'package:nomo_app/features/categories/data/models/categories.model.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
 import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
+import 'package:nomo_app/features/dashboard/presentation/widget/home_shimmer.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 import 'package:nomo_app/features/product/product_list/presentation/widgets/product_card.widget.dart';
 import 'package:nomo_app/features/store/data/models/store.model.dart';
@@ -24,6 +25,9 @@ class HomeView extends StatelessWidget {
     return NonInjectableBaseView<HomeCubit,
         (List<CategoryModel>?, List<ProductModel>?, StoreModel?)>(
       bottomSafeArea: false,
+      loadingbuilder: (context, state) {
+        return const HomeShimmer();
+      },
       builder: (context, state) {
         return HomeViewContent(
           onCategoriesTap: onCategoriesTap,
@@ -156,7 +160,7 @@ class HomeViewContent extends StatelessWidget {
             ),
           ),
           //TODO: add carousel
-          
+
           // Sliver for the carousel
           // SliverToBoxAdapter(
           //   child: Padding(

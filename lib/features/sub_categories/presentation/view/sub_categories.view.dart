@@ -11,6 +11,7 @@ import 'package:nomo_app/features/sub_categories/data/repositories/sub_categorie
 import 'package:nomo_app/features/sub_categories/data/sources/sub_categories_impl.source.dart';
 import 'package:nomo_app/features/sub_categories/domain/usecase/sub_categories.usecase.dart';
 import 'package:nomo_app/features/sub_categories/presentation/cubit/sub_categories.cubit.dart';
+import 'package:nomo_app/features/sub_categories/presentation/widgets/sub_category_shimmer.widget.dart';
 
 class SubCategoriesView extends StatelessWidget {
   static String routeName = "/sub_categories_view";
@@ -22,6 +23,9 @@ class SubCategoriesView extends StatelessWidget {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
     String categoryId = args["id"].toString();
     return InjectableBaseView<SubCategoriesCubit, List<SubCategoryModel>?>(
+      loadingbuilder: (context, state) {
+        return const SubCategoryShimmerWidget();
+      },
       bottomSafeArea: false,
       builder: (context, state) {
         return SubCategoriesContent(
@@ -93,7 +97,7 @@ class SubCategoriesContent extends StatelessWidget {
                                 onTap: () {
                                   // Ensure the list is non-null and iterate through subCategories to deselect them
                                   cubit.updateSubCategorySelection(index);
-                                 
+
                                   // Define tap action or leave empty if handled inside CategoryCard
                                 },
                               ),

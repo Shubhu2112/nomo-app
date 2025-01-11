@@ -7,14 +7,17 @@ import 'package:nomo_app/features/product/product_list/data/models/product.model
 import 'package:nomo_app/features/product/product_list/domain/product_list.usecase.dart';
 
 class ProductListCubit extends BaseCubit<List<ProductModel>?> {
-  ProductListCubit(super.context,
-      {required this.productListUsecase, });
+  ProductListCubit(
+    super.context, {
+    required this.productListUsecase,
+  });
 
   final ProductListUsecase productListUsecase;
 
   List<ProductModel>? products;
 
   fetchProducts(String subCategoryId) async {
+    isLoading = true;
     emit(const BaseLoadingState());
     products = [];
     Params params = Params();
@@ -23,7 +26,7 @@ class ProductListCubit extends BaseCubit<List<ProductModel>?> {
     params.andFilters.add(Filter(field: "enabled", values: ["true"]));
     final result = await productListUsecase.getProducts(params);
     products = result;
-
+    isLoading = false;
     emit(BaseCompletedState(data: data));
   }
 
