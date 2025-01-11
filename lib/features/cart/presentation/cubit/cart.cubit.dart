@@ -1,17 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.state.dart';
+import 'package:nomo_app/core/presentation/views/dependency_injection/get_it_dependency_injection.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/features/cart/data/models/cart.model.dart';
 import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
 import 'package:nomo_app/features/cart/domain/cart.usecase.dart';
 import 'package:nomo_app/features/cart/presentation/cubit/state/cart.state.dart';
+import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
 import 'package:nomo_app/features/order/data/models/order.model.dart';
 import 'package:nomo_app/features/order/domain/order.usecase.dart';
 import 'package:nomo_app/features/order/presentation/views/order_status.view.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product_option_value.model.dart';
+import 'package:nomo_app/features/profile/presentation/view/profile.view.dart';
 
 class CartCubit extends BaseCubit<CartState> {
   CartCubit(
@@ -93,7 +98,7 @@ class CartCubit extends BaseCubit<CartState> {
 
   // Add product to the cart, with or without options
   void addProductToCartWithOption(ProductModel? product,
-      {ProductOptionValueModel? productOptionValue, int quantity = 1 }) {
+      {ProductOptionValueModel? productOptionValue, int quantity = 1}) {
     final cartItem = CartItemModel(
       productId: product?.id ?? 0,
       productOptionValueId: productOptionValue?.id,
@@ -175,21 +180,22 @@ class CartCubit extends BaseCubit<CartState> {
   checkout() async {
     isLoading = true;
     emit(const BaseLoadingState());
-    if (cartState?.cartItems.isNotEmpty?? false) {
+    if (cartState?.cartItems.isNotEmpty ?? false) {
       CartModel? cartModel = await cartUsecase.checkout(
           CartModel(storeId: 1, cartItems: cartState?.cartItems ?? []));
       cartState?.cartItems = [];
       cartState?.cartItems.addAll(cartModel?.cartItems ?? []);
       isLoading = false;
       emit(BaseCompletedState(data: data));
-    }else{
-      emit(EmptyCartState(data: data,message: "Your cart is empty"));
+    } else {
+      emit(EmptyCartState(data: data, message: "Your cart is empty"));
     }
   }
 
   placeOrder(int addressId) async {
+    int storeId =  getIt<HomeCubit>().data?.$3?.id ?? 0;
     OrderModel? orderModel = await orderUsecase.placeOrder(CartModel(
-        storeId: 1,
+        storeId: storeId,
         addressId: addressId,
         cartItems: cartState?.cartItems ?? []));
     cartState?.orderModel = orderModel;
