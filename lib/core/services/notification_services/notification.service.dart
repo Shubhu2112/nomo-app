@@ -4,7 +4,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nomo_app/firebase_options.dart';
 
 class NotificationService {
-  static void Function({String? status, String?orderId})? onOrderStatusUpdate;
+  static void Function(
+      {String? status,
+      String? orderId,
+      String? deliveryCaptainContactNum,
+      String? deliveryCaptainName})? onOrderStatusUpdate;
 
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -59,9 +63,23 @@ class NotificationService {
       if (message.data.containsKey('orderStatus') &&
           onOrderStatusUpdate != null) {
         String updatedStatus = message.data['orderStatus'];
+
+        String? deliveryCaptainName =
+            message.data.containsKey('deliveryCaptainName')
+                ? message.data['deliveryCaptainName']
+                : null;
+        String? deliveryCaptainContactNum =
+            message.data.containsKey('deliveryCaptainContactNum')
+                ? message.data['deliveryCaptainContact']
+                : null;
+
         String orderId = message.data['orderId'];
         onOrderStatusUpdate?.call(
-            orderId: orderId, status: updatedStatus); // Trigger the callback
+            orderId: orderId,
+            status: updatedStatus,
+            deliveryCaptainName: deliveryCaptainName,
+            deliveryCaptainContactNum:
+                deliveryCaptainContactNum); // Trigger the callback
       }
 
       flutterLocalNotificationsPlugin.show(

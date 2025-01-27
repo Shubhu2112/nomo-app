@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/views/non_injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
+import 'package:nomo_app/core/presentation/widgets/common/custom_search_bar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
@@ -12,6 +16,7 @@ import 'package:nomo_app/features/dashboard/presentation/cubit/home.cubit.dart';
 import 'package:nomo_app/features/dashboard/presentation/widget/home_shimmer.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 import 'package:nomo_app/features/product/product_list/presentation/widgets/product_card.widget.dart';
+import 'package:nomo_app/features/product/product_search/presentation/view/product_search.view.dart';
 import 'package:nomo_app/features/store/data/models/store.model.dart';
 
 class HomeView extends StatelessWidget {
@@ -61,6 +66,7 @@ class HomeViewContent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: CustomScrollView(
+        controller: context.read<HomeCubit>().scrollController,
         slivers: [
           // SliverAppBar with a Custom Search Bar and Header
           SliverAppBar(
@@ -124,33 +130,22 @@ class HomeViewContent extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 20),
-                      child: CustomTextField(
-                        controller: searchController,
-                        hintText: "Search Namkeen",
-                        isRequired: false,
-                        isEnable: true,
-                        textInputType: TextInputType.text,
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        borderRadius: 24,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        focusedColor: Theme.of(context).colorScheme.primary,
-                        enabledBorder: Theme.of(context).colorScheme.onPrimary,
-                        isDense: true,
-                        onChanged: (value) {
-                          // Handle search query changes here
-                          print('Search Query: $value');
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a search term';
-                          }
-                          return null;
+                      child: CustomSearchBar(
+                        onPress: () {
+                          NavigationService.goNext(
+                            context,
+                            ProductSearchView.routeName,
+                          ).then((value) async {
+                            if (context.mounted) {
+                                FocusScope.of(context)
+                                  .unfocus(); // Dismiss the keyboard
+                            await  SystemChannels.textInput
+                                  .invokeMethod('TextInput.hide');
+                             await SystemChannels.textInput
+                                  .invokeMethod('TextInput.hide');
+                            
+                            }
+                          });
                         },
                       ),
                     ),
@@ -220,8 +215,9 @@ class HomeViewContent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CustomText("Best Selling 🔥").db().bold(),
-                  TextButton(
-                      onPressed: () {}, child: CustomText("See all").db()),
+                  // TODO : need to add more functionality
+                  // TextButton(
+                  //     onPressed: () {}, child: CustomText("See all").db()),
                 ],
               ),
             ),

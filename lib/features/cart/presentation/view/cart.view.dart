@@ -102,7 +102,7 @@ class CartContent extends StatelessWidget {
           width: double.infinity,
           textValue: CustomText(selectedAddressModel == null
                   ? "Add Address to Proceed"
-                  : "Click to Pay (₹ ${cartAmount.priceTotal})  >")
+                  : "Pay on Delivery (₹ ${cartAmount.priceTotal})  >")
               .lb()
               .textColor(Theme.of(context).colorScheme.surface),
           onPress: () {
@@ -112,7 +112,7 @@ class CartContent extends StatelessWidget {
               DialogBox.loadingDialog(
                 context,
                 Lottie.asset("groceries_loading".anm,
-                    fit: BoxFit.cover, height: 248),
+                    fit: BoxFit.scaleDown, height: 100),
               );
               context
                   .read<CartCubit>()
@@ -179,7 +179,7 @@ class CartContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const GradientCard(),
+               GradientSavingCard(totalSavings: cartAmount.totalSavings,),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: CustomText("Review items").db().bold(),

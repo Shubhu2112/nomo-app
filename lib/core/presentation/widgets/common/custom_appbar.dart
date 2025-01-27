@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/widgets/common/custom_search_bar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
@@ -11,17 +12,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPress;
   final bool showBackButton;
   final Widget? titleWidget;
+  final void Function()? onSearchPress;
 
-  CustomAppBar(
+  const CustomAppBar(
       {super.key,
       // this.title,
       this.searchHint,
       this.onBackPress,
       this.onSearch,
       this.showBackButton = false,
-      this.titleWidget});
-
-  final TextEditingController searchController = TextEditingController();
+      this.titleWidget,this.onSearchPress});
 
   @override
   Widget build(BuildContext context) {
@@ -50,34 +50,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       )),
                 Expanded(
                   child: titleWidget ??
-                      CustomTextField(
-                        controller: searchController,
-                        hintText: searchHint ?? "Search Namkeen",
-                        isRequired: false,
-                        isEnable: true,
-                        textInputType: TextInputType.text,
-                        prefixIcon: Icon(Icons.search,
-                            color: Theme.of(context).colorScheme.primary),
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        borderRadius: 24,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        focusedColor: Theme.of(context).colorScheme.primary,
-                        enabledBorder: Theme.of(context).colorScheme.onPrimary,
-                        isDense: true,
-                        onChanged: (value) {
-                          // Handle search query changes here
-                          print('Search Query: $value');
-
-                          onSearch?.call(value);
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a search term';
-                          }
-                          return null;
-                        },
+                      CustomSearchBar(
+                        onSearch: onSearch,
+                        searchHint: searchHint,
+                        onPress: onSearchPress,
                       ),
                 ),
               ],

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
+import 'package:nomo_app/core/presentation/base_cubits/base.state.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_carousel.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_textfield.dart';
@@ -53,6 +54,11 @@ class _DashboardViewState extends State<DashboardView> {
   void initState() {
     super.initState();
     context.read<AddressListCubit>().init();
+    print("home cubit state ------------${context.read<HomeCubit>().state}");
+    if (context.read<HomeCubit>().store==null&& context.read<HomeCubit>().state is BaseCompletedState) {
+      context.read<HomeCubit>().init();
+    }
+    // context.read<HomeCubit>().init();
     // Initialize _pages here after the state is fully initialized
     _pages = [
       HomeView(

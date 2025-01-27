@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nomo_app/core/common/widget/common_shimmer_container.widget.dart';
+import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/views/non_injectable_base.view.dart';
 import 'package:nomo_app/features/product/product_list/data/models/product.model.dart';
 import 'package:nomo_app/features/product/product_list/presentation/cubit/product_list.cubit.dart';
@@ -19,14 +22,24 @@ class ProductListView extends StatelessWidget {
         );
       },
       loadingbuilder: (context, state) {
-        return Shimmer.fromColors(
-            baseColor: Colors.grey,
-            highlightColor: Colors.white,
-            child: Container(
-              color: Colors.red,
-              height: 20,
-              width: 20,
-            ));
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, childAspectRatio: 0.64),
+          itemCount: 8,
+          itemBuilder: (context, index) {
+            return const Padding(
+              padding: EdgeInsets.all(7.0),
+              child: CommonShimmerContainer(
+                child: Card(
+                  child: SizedBox(
+                    height: double.infinity,
+                    width: double.infinity,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
       },
       listener: (context, state) => print(state),
     );
@@ -42,6 +55,7 @@ class ProductListContent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 6, left: 1),
       child: GridView.builder(
+        controller: context.read<ProductListCubit>().scrollController,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2, childAspectRatio: 0.64),
         itemCount: productList?.length,

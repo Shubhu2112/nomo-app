@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nomo_app/core/common/parser/query_helper.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
@@ -22,23 +23,67 @@ class HomeCubit extends BaseCubit<
   final HomeUsecase homeUsecase;
   List<CategoryModel>? _categories;
   List<ProductModel>? _bestSellingProducts;
-  StoreModel? _store;
+  StoreModel? store;
   UserModel? userModel;
+  Params bestSellingParams = Params();
+  ScrollController scrollController = ScrollController();
 
   _fetchCategories() async {
     Params params = Params();
     params.andFilters.add(Filter(field: "enabled", values: ["true"]));
+    params.sortFields.add(Sort(field: 'priority', order: "ASC"));
     final result = await homeUsecase.getCategories(params);
     _categories = result;
     // emit(BaseCompletedState(data: data));
   }
 
-  _fetchBestSellingProducts() async {
-    Params params = Params();
-    params.andFilters.add(Filter(field: "subCategoryId", values: ["1"]));
-    final result = await homeUsecase.getBestSellingProducts(params);
-    _bestSellingProducts = result;
+  _fetchBestSellingProducts({bool isInit = true}) async {
+    if (isInit) {
+      _initializeFetch();
+    } else {
+      _addShimmerLoading();
+      bestSellingParams.page++;
+    }
+
+    try {
+      final result =
+          await homeUsecase.getBestSellingProducts(bestSellingParams);
+
+      if (isInit) {
+        _bestSellingProducts = result;
+        isLoading = false;
+      } else {
+        _bestSellingProducts?.addAll(result ?? []);
+        _removeShimmerLoading();
+      }
+
+      emit(BaseCompletedState(data: data));
+    } catch (e) {
+      emit(BaseErrorState(errorMessage: "Failed to fetch orders: $e"));
+    }
+  }
+
+  void _initializeFetch() {
+    isLoading = true;
+    emit(const BaseLoadingState());
+    _bestSellingProducts = [];
+    bestSellingParams = Params();
+    // params.limit = 4;
+
+    bestSellingParams.andFilters
+        .add(Filter(field: "subCategoryId", values: ["1"]));
+  }
+
+  void _addShimmerLoading() {
+    final shimmerProduct = ProductModel(isLoading: true);
+    for (int i = 0; i < 10; i++) {
+      _bestSellingProducts?.add(shimmerProduct);
+    }
     emit(BaseCompletedState(data: data));
+  }
+
+  void _removeShimmerLoading() {
+    _bestSellingProducts?.removeWhere((order) => order.isLoading);
   }
 
   _getStore() async {
@@ -53,12 +98,12 @@ class HomeCubit extends BaseCubit<
           dataSource: StoreImplDataSource(httpService: ApiRestService()),
         ),
       );
-      _store = await storeUsecase.getStore(
+      store = await storeUsecase.getStore(
           lat: "19.22241922639179", long: "73.16165912356324");
       // lat: position?.latitude.toString()??"0.0", long: position?.longitude.toString()??"0.0");
     }
 
-    if (_store == null) {
+    if (store == null) {
       emit(BaseErrorState(
           errorMessage: "Sorry,\nwe currently do not serve in your area."));
     }
@@ -66,11 +111,22 @@ class HomeCubit extends BaseCubit<
 
   @override
   (List<CategoryModel>?, List<ProductModel>?, StoreModel?)? get data =>
-      (_categories, _bestSellingProducts, _store);
+      (_categories, _bestSellingProducts, store);
 
   @override
   FutureOr<void> init() async {
-    if (state is! BaseLoadingState) emit(const BaseLoadingState());
+    if (state is! BaseLoadingState) {
+      emit(const BaseLoadingState());
+      isLoading = true;
+    }
+ scrollController.addListener(() async {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        // if (!isLoading) {
+        await _fetchBestSellingProducts(isInit: false);
+        // }
+      }
+    });
     await _getStore();
     if (state is! BaseErrorState) {
       await _fetchCategories();

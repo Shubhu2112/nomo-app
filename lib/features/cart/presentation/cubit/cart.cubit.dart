@@ -6,6 +6,7 @@ import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.state.dart';
 import 'package:nomo_app/core/presentation/views/dependency_injection/get_it_dependency_injection.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/core/services/offline_db_services/hive.service.dart';
 import 'package:nomo_app/features/cart/data/models/cart.model.dart';
 import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
 import 'package:nomo_app/features/cart/domain/cart.usecase.dart';
@@ -52,9 +53,13 @@ class CartCubit extends BaseCubit<CartState> {
           if (item.productId == productId &&
               (item.productOptionValueId == optionValueId ||
                   optionValueId == null)) {
+            final updatedItem =
+                item.copyWith(quantity: (item.quantity ?? 0) + 1);
+            HiveService().updateCartItem(updatedItem);
             // Increment the quantity if both productId and optionValueId match (or optionValueId is null for products without options)
-            return item.copyWith(quantity: (item.quantity ?? 0) + 1);
+            return updatedItem;
           }
+
           return item;
         }).toList() ??
         [];
@@ -78,8 +83,12 @@ class CartCubit extends BaseCubit<CartState> {
                       optionValueId == null)) {
                 // If quantity is greater than 1, decrement the quantity
                 if ((item.quantity ?? 1) > 1) {
-                  return item.copyWith(quantity: (item.quantity ?? 1) - 1);
+                  final updatedItem =
+                      item.copyWith(quantity: (item.quantity ?? 1) - 1);
+                  HiveService().updateCartItem(updatedItem);
+                  return updatedItem;
                 } else {
+                  HiveService().removeCartItem(item.productId ?? -1);
                   // If quantity is 1, we mark it for removal by returning null
                   return null;
                 }
@@ -104,18 +113,26 @@ class CartCubit extends BaseCubit<CartState> {
       productOptionValueId: productOptionValue?.id,
       product: product,
       productOptionValue: productOptionValue,
-      // maxRetailPrice: product?.maxRetailPrice ?? maxRetailPrice,
+      maxRetailPrice: product?.maxRetailPrice ?? productOptionValue?.maxRetailPrice,
       // unit: product?.unit ?? optionName,
       // name: product?.name,
       // image: product?.image,
-      // price: product?.sellingPrice ?? sellingPrice,
+      price: product?.sellingPrice ?? productOptionValue?.sellingPrice,
       quantity: quantity, // Default quantity is 1
       // productModel: product,
     );
+    HiveService().addCartItem(cartItem);
     cartState?.cartItems.add(cartItem);
     print(data?.cartItems
         .map(
           (e) => e,
+        )
+        .toList());
+    print("hive data=====");
+    print(HiveService()
+        .getAllCartItems()
+        .map(
+          (e) => e.productId,
         )
         .toList());
     emit(BaseCompletedState(data: data));
@@ -193,11 +210,13 @@ class CartCubit extends BaseCubit<CartState> {
   }
 
   placeOrder(int addressId) async {
-    int storeId =  getIt<HomeCubit>().data?.$3?.id ?? 0;
+    int storeId = getIt<HomeCubit>().store?.id ?? 0;
     OrderModel? orderModel = await orderUsecase.placeOrder(CartModel(
         storeId: storeId,
         addressId: addressId,
         cartItems: cartState?.cartItems ?? []));
+    HiveService().clearCart();
+    cartState?.cartItems = [];
     cartState?.orderModel = orderModel;
     if (orderModel != null) {
       emit(OrderPlaceState(data: data));
@@ -208,7 +227,8 @@ class CartCubit extends BaseCubit<CartState> {
   FutureOr<void> init() async {
     if (state is! BaseLoadingState) emit(const BaseLoadingState());
     // await fetchProducts(subCategoryId!);
-    cartState = CartState([], null);
+
+    cartState = CartState(HiveService().getAllCartItems(), null);
     if (!isDisposed) {
       emit(BaseCompletedState(data: data));
     }

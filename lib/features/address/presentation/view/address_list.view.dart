@@ -26,7 +26,26 @@ class AddressListView extends StatelessWidget {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: CustomAppBar(
-        showBackButton: true,
+        // showBackButton: true,
+        titleWidget: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                    onPressed: () {
+                      NavigationService.goBack(context);
+                    },
+                    icon: Icon(
+                      Icons.arrow_back_rounded,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    )),
+                CustomText("Your Address").db().bold(),
+              ],
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -58,28 +77,32 @@ class AddressListViewContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: ListView.separated(
-        itemCount: addresses?.length ?? 0,
-        itemBuilder: (context, index) {
-          AddressModel? address = addresses?[index];
-          return AddressListCardWidget(
-            addressModel: address,
-            onTap: (isCart ?? false)
-                ? () {
-                    context
-                        .read<AddressListCubit>()
-                        .updateSelectedAddress(address);
+      child: addresses?.isNotEmpty ?? false
+          ? ListView.separated(
+              itemCount: addresses?.length ?? 0,
+              itemBuilder: (context, index) {
+                AddressModel? address = addresses?[index];
+                return AddressListCardWidget(
+                  addressModel: address,
+                  onTap: (isCart ?? false)
+                      ? () {
+                          context
+                              .read<AddressListCubit>()
+                              .updateSelectedAddress(address);
 
-                    NavigationService.goBack(context);
-                  }
-                : null,
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) => Divider(
-          thickness: 2,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
+                          NavigationService.goBack(context);
+                        }
+                      : null,
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) => Divider(
+                thickness: 2,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            )
+          : Center(
+              child: CustomText("No Addresses !!!").dm(),
+            ),
     );
   }
 }

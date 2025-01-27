@@ -19,6 +19,7 @@ class ProductModel with _$ProductModel {
     double? sellingPrice,
     List<ProductOptionModel>? productOptions,
     List<ProductOptionValueModel>? productOptionsValues,
+   @Default(false) bool isLoading,
   }) = _ProductModel;
 
   factory ProductModel.fromJson(Map<String, dynamic> json) =>

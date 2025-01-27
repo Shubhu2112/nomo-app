@@ -38,6 +38,12 @@ import 'package:nomo_app/features/product/product_list/data/repository/product_l
 import 'package:nomo_app/features/product/product_list/data/sources/product_list_impl.dart';
 import 'package:nomo_app/features/product/product_list/domain/product_list.usecase.dart';
 import 'package:nomo_app/features/product/product_list/presentation/cubit/product_list.cubit.dart';
+import 'package:nomo_app/features/product/product_search/data/repository/product_search.repository.dart';
+import 'package:nomo_app/features/product/product_search/data/repository/product_search_impl.repository.dart';
+import 'package:nomo_app/features/product/product_search/data/sources/product_search.source.dart';
+import 'package:nomo_app/features/product/product_search/data/sources/product_search_impl.source.dart';
+import 'package:nomo_app/features/product/product_search/domain/product_search.usecase.dart';
+import 'package:nomo_app/features/product/product_search/presentation/cubit/product_search.cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -49,7 +55,9 @@ class ServiceLocator {
 
   // Core Services
   static void _registerCoreServices() {
-    getIt.registerLazySingleton<HttpService>(() => ApiRestService());
+    if (!getIt.isRegistered<HttpService>()) {
+      getIt.registerLazySingleton<HttpService>(() => ApiRestService());
+    }
   }
 
   // Feature Modules
@@ -83,6 +91,16 @@ class ServiceLocator {
       getIt.registerLazySingleton(
           () => ProductListCubit(context, productListUsecase: getIt()));
 
+      // prodyuct search
+      getIt.registerLazySingleton<ProductSearchDataSource>(
+          () => ProductSearchImplDataSource(httpService: getIt()));
+      getIt.registerLazySingleton<ProductSearchRepository>(
+          () => ProductSearchImplRepository(dataSource: getIt()));
+      getIt
+          .registerLazySingleton(() => ProductSearchUsecase(repository: getIt()));
+      getIt.registerLazySingleton(
+          () => ProductSearchCubit(context, productSearchUsecase: getIt()));
+
       // Address
       getIt.registerLazySingleton<AddressDataSource>(
           () => AddressImplDataSource(httpService: getIt()));
@@ -94,7 +112,7 @@ class ServiceLocator {
       getIt.registerLazySingleton(
           () => AddAddressCubit(context, addressUsecase: getIt()));
 
- // Order
+      // Order
       getIt.registerLazySingleton<OrderDataSource>(
           () => OrderImplDataSource(httpService: getIt()));
       getIt.registerLazySingleton<OrderRepository>(
@@ -113,10 +131,8 @@ class ServiceLocator {
       getIt.registerLazySingleton(() => CartCubit(
             context,
             cartUsecase: getIt<CartUsecase>(),
-            orderUsecase:  getIt<OrderUsecase>(),
+            orderUsecase: getIt<OrderUsecase>(),
           ));
-
-     
 
       // getIt.registerFactory<SubCategoriesImplDataSource>(
       //     () => SubCategoriesImplDataSource(httpService: getIt()));

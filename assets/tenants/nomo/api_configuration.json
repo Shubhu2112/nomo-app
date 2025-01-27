@@ -3,7 +3,7 @@
   "timeout": 120,
   "retry": 3,
   "Dev": {
-    "baseUrl": "https://nomo-staging.up.railway.app",
+    "baseUrl": "http://192.168.29.221:4002",
     "mfApiBaseUrl": "https://uat-publicsvc.heytorus.com/mutualfund/api",
     "authApiBaseUrl": "https://uat-publicsvc.heytorus.com/users/api",
     "esApiBaseUrl": "https://elastic:oE4QEqoZtjSpZX07IHmBiepy@eb9edd9570f44fe79a3d1f9bbab4193e.us-central1.gcp.cloud.es.io",
@@ -11,7 +11,7 @@
     "bankDebitCardKey": "89555EED0B07495D00A6C11789D40E1D"
   },
   "UAT": {
-    "baseUrl": "https://uat-publicsvc.heytorus.com/",
+    "baseUrl": "http://13.60.157.251:4002",
     "mfApiBaseUrl": "https://uat-publicsvc.heytorus.com/mutualfund/api",
     "authApiBaseUrl": "https://uat-publicsvc.heytorus.com/users/api",
     "esApiBaseUrl": "https://elastic:oE4QEqoZtjSpZX07IHmBiepy@eb9edd9570f44fe79a3d1f9bbab4193e.us-central1.gcp.cloud.es.io",

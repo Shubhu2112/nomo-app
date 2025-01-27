@@ -14,10 +14,10 @@ class CartUsecase {
 
     for (var item in cartItems) {
       final itemQuantity = item.quantity ?? 1;
-      final maxRetailPrice = item.product?.maxRetailPrice ??
+      final maxRetailPrice = item.maxRetailPrice?? item.product?.maxRetailPrice ??
           item.productOptionValue?.maxRetailPrice ??
           0;
-      final sellingPrice = item.product?.sellingPrice ??
+      final sellingPrice = item.price ?? item.product?.sellingPrice ??
           item.productOptionValue?.sellingPrice ??
           0;
 

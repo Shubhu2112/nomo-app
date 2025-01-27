@@ -19,10 +19,10 @@ class CategoriesCubit extends BaseCubit<List<CategoryModel>> {
 
   _fetchCategories() async {
     Params params = Params();
+    params.limit = 30;
     params.andFilters
         .add(Filter(field: "priority", values: ["1", "2", "3", "4"]));
-         params.andFilters
-        .add(Filter(field: "enabled", values: ["true"]));
+    params.andFilters.add(Filter(field: "enabled", values: ["true"]));
     final result = await categoriesUsecase.getCategories(params);
     _categories = result;
     groceryCategories.addAll(_categories
@@ -31,19 +31,19 @@ class CategoriesCubit extends BaseCubit<List<CategoryModel>> {
             )
             .toList() ??
         []);
-         snacksCategories.addAll(_categories
+    snacksCategories.addAll(_categories
             ?.where(
               (element) => element.priority == 2,
             )
             .toList() ??
         []);
-         beautyCategories.addAll(_categories
+    beautyCategories.addAll(_categories
             ?.where(
               (element) => element.priority == 3,
             )
             .toList() ??
         []);
-         householdCategories.addAll(_categories
+    householdCategories.addAll(_categories
             ?.where(
               (element) => element.priority == 4,
             )

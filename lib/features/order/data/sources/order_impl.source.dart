@@ -53,9 +53,9 @@ class OrderImplDataSource implements OrderDataSource {
   Future<List<OrderModel>?> getOrders(Params? params) async {
    final apiResponse = await _httpService.handleGetRequestList(
       ApiConstants.getOrder,
-      // params: params,
+      params: params,
       isPublic: false,
-      useDataKey: false
+      useDataKey: true
     );
 
     List<OrderModel>? response;

@@ -103,69 +103,17 @@ class OrderStatusViewContent extends StatelessWidget {
                       OrderStatusTimelineWidget(
                         currentOrderId: orderModel?.id,
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        child: CustomText(
-                                "Sit Back, Your Order is being Packed")
-                            .ls()
-                            .textColor(Theme.of(context).colorScheme.surface),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Column(
                           children: [
-                            Row(
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(
-                                    right: 12,
-                                  ),
-                                  child: CircleAvatar(
-                                    child: Icon(Icons.person),
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CustomText("Hi, I am NAME ")
-                                            .dm()
-                                            .bold(),
-                                        CustomText("(Delivery Partner)").dm()
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CustomText(
-                                                "Chat/Call Delivery Partner: ")
-                                            .dm(),
-                                        InkWell(
-                                            onTap: () {},
-                                            child: CustomText("Click here")
-                                                .dm()
-                                                .decoration(
-                                                    TextDecoration.underline))
-                                      ],
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
+                      
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 CustomText(
-                                        "${orderModel?.orderItems?.length} Items : Rs ${orderModel?.savings} Saved")
+                                        "${orderModel?.orderItems?.length} Items : Rs ${orderModel?.totalAmount} Total")
                                     .dm()
                                     .bold(),
                                 TextButton(
@@ -175,7 +123,7 @@ class OrderStatusViewContent extends StatelessWidget {
                                           arg: orderModel);
                                     },
                                     child: CustomText(
-                                            "Order Details (${orderModel?.id}) >")
+                                            "Order #ID${orderModel?.id} >")
                                         .dm()
                                         .textColor(
                                             Theme.of(context).primaryColor))
@@ -193,7 +141,7 @@ class OrderStatusViewContent extends StatelessWidget {
                                 CustomText("  Delivering To : ").dm().bold(),
                                 Flexible(
                                   child: CustomText(
-                                          "${orderModel?.address?.streetName1},${orderModel?.address?.streetName2},${orderModel?.address?.pincode}")
+                                          "${orderModel?.address?.streetName1}, ${orderModel?.address?.streetName2}, ${orderModel?.address?.pincode}")
                                       .ds(),
                                 )
                               ],

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:nomo_app/core/common/parser/query_helper.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.state.dart';
@@ -15,19 +16,51 @@ class ProductListCubit extends BaseCubit<List<ProductModel>?> {
   final ProductListUsecase productListUsecase;
 
   List<ProductModel>? products;
+  Params params = Params();
+  String? subCategory;
+  ScrollController scrollController = ScrollController();
 
-  fetchProducts(String subCategoryId) async {
+  Future<void> fetchProducts({String? subCategoryId, bool isInit = true}) async {
+    if (isInit) {
+      _initializeFetch(subCategoryId);
+    } else {
+      _addShimmerLoading();
+      params.page++;
+    }
+
+    final result = await productListUsecase.getProducts(params);
+
+    if (isInit) {
+      products = result;
+      isLoading = false;
+    } else {
+      products?.addAll(result ?? []);
+      _removeShimmerLoading();
+    }
+    emit(BaseCompletedState(data: data));
+  }
+
+  void _initializeFetch(String? subCategoryId) {
     isLoading = true;
+    subCategory = subCategoryId;
     emit(const BaseLoadingState());
     products = [];
-    Params params = Params();
+    params = Params();
     params.andFilters
-        .add(Filter(field: "subCategoryId", values: [subCategoryId]));
+        .add(Filter(field: "subCategoryId", values: [subCategory ?? ""]));
     params.andFilters.add(Filter(field: "enabled", values: ["true"]));
-    final result = await productListUsecase.getProducts(params);
-    products = result;
-    isLoading = false;
+  }
+
+  void _addShimmerLoading() {
+    ProductModel temp = ProductModel().copyWith(isLoading: true);
+    for (int i = 0; i < 10; i++) {
+      products?.add(temp);
+    }
     emit(BaseCompletedState(data: data));
+  }
+
+  void _removeShimmerLoading() {
+    products?.removeWhere((product) => product.isLoading);
   }
 
   @override
@@ -35,11 +68,13 @@ class ProductListCubit extends BaseCubit<List<ProductModel>?> {
 
   @override
   FutureOr<void> init() async {
-    if (state is! BaseLoadingState) emit(const BaseLoadingState());
-    // await fetchProducts(subCategoryId!);
+    emit(const BaseInitialState());
 
-    // if (!isDisposed) {
-    //   emit(BaseCompletedState(data: data));
-    // }
+    scrollController.addListener(() async {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        await fetchProducts(isInit: false);
+      }
+    });
   }
 }

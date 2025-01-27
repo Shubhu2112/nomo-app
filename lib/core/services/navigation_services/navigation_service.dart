@@ -11,6 +11,7 @@ import 'package:nomo_app/features/order/presentation/widgets/order_success.widge
 import 'package:nomo_app/features/order/presentation/views/order_summary.view.dart';
 import 'package:nomo_app/features/order/presentation/views/orders_list.view.dart';
 import 'package:nomo_app/features/product/product_details/presentation/view/product_details.view.dart';
+import 'package:nomo_app/features/product/product_search/presentation/view/product_search.view.dart';
 import 'package:nomo_app/features/sub_categories/presentation/view/sub_categories.view.dart';
 
 class NavigationService {
@@ -35,7 +36,8 @@ class NavigationService {
       OrderSummaryView.routeName: (context) => const OrderSummaryView(),
       AddressListView.routeName: (context) => const AddressListView(),
       AddAddressView.routeName: (context) => const AddAddressView(),
-      OrderStatusView.routeName: (context) => const OrderStatusView()
+      OrderStatusView.routeName: (context) => const OrderStatusView(),
+      ProductSearchView.routeName: (context) => const ProductSearchView()
       // VideoListView.routeName: (context) => const VideoListView(),
       // HlsVideoPlayerView.routeName: (context) => const HlsVideoPlayerView()
     };

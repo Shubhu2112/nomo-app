@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 
-class GradientCard extends StatelessWidget {
-  const GradientCard({super.key});
+class GradientSavingCard extends StatelessWidget {
+final double? totalSavings;
+  
+  const GradientSavingCard({super.key, this.totalSavings,});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class GradientCard extends StatelessWidget {
           children: [
             CustomText("Hurray !  ").lm().textColor(Theme.of(context).colorScheme.primary),
             CustomText(
-              "you saved ₹26 !!!",
+              "you saved ₹$totalSavings !!!",
               
             ).lm().textColor(Theme.of(context).colorScheme.primary).bold()
           ],

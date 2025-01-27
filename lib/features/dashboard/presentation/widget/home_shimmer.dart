@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nomo_app/core/common/widget/common_shimmer_container.widget.dart';
+import 'package:nomo_app/features/dashboard/presentation/widget/category_shimmer_card.widget.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HomeShimmer extends StatelessWidget {
@@ -59,69 +60,83 @@ class HomeShimmer extends StatelessWidget {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            const CommonShimmerContainer(
-              height: 30,
-              width: 120,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: List.generate(
-                3,
-                (index) {
-                  return const Padding(
-                    padding: EdgeInsets.only(right: 25.0),
-                    child: CommonShimmerContainer(
-                      child: ClipOval(
-                        child: CircleAvatar(
-                            radius: 38, backgroundColor: Color(0xffFFDEDE)),
-                      ),
-                    ),
-                  );
-                },
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 20,
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const CommonShimmerContainer(
-              height: 30,
-              width: 90,
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Wrap(
-              children: List.generate(
-                2,
-                (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 20.0),
-                    child: CommonShimmerContainer(
-                      child: Container(
-                        height: 220,
-                        width: 160,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                              16,
-                            ),
-                            color: Colors.white),
-                      ),
-                    ),
-                  );
-                },
+              const CommonShimmerContainer(
+                height: 27,
+                width: 120,
               ),
-            )
-          ],
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                children: List.generate(
+                  3,
+                  (index) {
+                    return const CategoryShimmerCardWidget();
+                  },
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              const Padding(
+                 padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                     CommonShimmerContainer(
+                      height: 27,
+                      width: 110,
+                    ),
+                     CommonShimmerContainer(
+                      height: 27,
+                      width: 80,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  runAlignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  //   runSpacing: 8,
+
+                  // spacing: 8,
+                  children: List.generate(
+                    4,
+                    (index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: CommonShimmerContainer(
+                          child: Container(
+                            height: 220,
+                            width: 160,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  16,
+                                ),
+                                color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

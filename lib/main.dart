@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:nomo_app/core/presentation/app_theme/app_theme.dart';
 import 'package:nomo_app/core/presentation/views/dependency_injection/get_it_dependency_injection.dart';
 import 'package:nomo_app/core/presentation/views/splash.view.dart';
@@ -9,6 +10,7 @@ import 'package:nomo_app/core/services/flavor_services/sources/asset_flavor_impl
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/core/services/network_services/dio_http_impl.service.dart';
 import 'package:nomo_app/core/services/notification_services/notification.service.dart';
+import 'package:nomo_app/core/services/offline_db_services/hive.service.dart';
 import 'package:nomo_app/features/address/data/repositories/address_impl.repository.dart';
 import 'package:nomo_app/features/address/data/sources/address_impl.source.dart';
 import 'package:nomo_app/features/address/domain/usecase/address.usecase.dart';
@@ -33,10 +35,12 @@ import 'package:nomo_app/features/product/product_list/data/repository/product_l
 import 'package:nomo_app/features/product/product_list/data/sources/product_list_impl.dart';
 import 'package:nomo_app/features/product/product_list/domain/product_list.usecase.dart';
 import 'package:nomo_app/features/product/product_list/presentation/cubit/product_list.cubit.dart';
+import 'package:nomo_app/features/product/product_search/presentation/cubit/product_search.cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.initializeFCM();
+  await HiveService().init();
   await FlavorRepositoryImpl(dataSource: AssetFlavorDataSource())
       .loadAppConfiguration();
   runApp(const MyApp());
@@ -57,6 +61,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt<HomeCubit>()),
         BlocProvider(create: (context) => getIt<CategoriesCubit>()),
         BlocProvider(create: (context) => getIt<ProductListCubit>()),
+           BlocProvider(create: (context) => getIt<ProductSearchCubit>()),
         BlocProvider(create: (context) => getIt<AddressListCubit>()),
         BlocProvider(create: (context) => getIt<AddAddressCubit>()),
         BlocProvider(create: (context) => getIt<CartCubit>()),

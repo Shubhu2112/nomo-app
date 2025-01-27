@@ -85,11 +85,11 @@ class OrderSummaryView extends StatelessWidget {
                     const SizedBox(height: 4),
                     OrderDetailsItemWidget(
                       title: "Order id",
-                      value: "ORD${orderModel?.id}",
+                      value: "#${orderModel?.id}",
                     ),
                     const OrderDetailsItemWidget(
                       title: "Payment",
-                      value: "Paid Online",
+                      value: "Pay on Delivery",
                     ),
                     OrderDetailsItemWidget(
                       title: "Deliver to",

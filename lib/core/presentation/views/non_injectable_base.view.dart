@@ -9,7 +9,7 @@ class NonInjectableBaseView<T extends BaseCubit<E>, E> extends StatelessWidget {
   final Function(BuildContext context, BaseState state) listener;
   final Widget Function(BuildContext context, BaseErrorState state)?
       errorBuilder;
-      final Widget Function(BuildContext context,  BaseInitialState state)?
+  final Widget Function(BuildContext context, BaseInitialState state)?
       initBuilder;
   final Widget Function(BuildContext context, BaseState state)? loadingbuilder;
 
@@ -73,12 +73,13 @@ class NonInjectableBaseView<T extends BaseCubit<E>, E> extends StatelessWidget {
                           textAlign: TextAlign.center,
                         )),
 
-                        
-                if ((state is BaseLoadingState &&
-                        context.read<T>().isLoading) ||
-                    state is BaseInitialState)
+                if ((state is BaseLoadingState && context.read<T>().isLoading))
                   loadingbuilder != null
                       ? loadingbuilder!(context, state)
+                      : const Center(
+                          child: CircularProgressIndicator.adaptive()),
+                if (state is BaseInitialState)  initBuilder != null
+                      ? initBuilder!(context, state)
                       : const Center(
                           child: CircularProgressIndicator.adaptive()),
               ],

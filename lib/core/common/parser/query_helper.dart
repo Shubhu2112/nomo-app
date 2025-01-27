@@ -1,6 +1,6 @@
 class Params {
-  int? from;
-  int? size;
+  int page;
+  int limit;
   List<Filter> andFilters;
   List<Filter> orFilters;
   List<RangeFilter> rangeFilters;
@@ -8,8 +8,8 @@ class Params {
   String? queryString;
 
   Params({
-    this.from = 0,
-    this.size = 10,
+    this.page = 1,
+    this.limit = 10,
     List<Filter>? andFilters,
     List<Filter>? orFilters,
     List<RangeFilter>? rangeFilters,
@@ -81,19 +81,19 @@ class QueryHelper {
       ];
     }
 
-    Map<String, dynamic> query = {
-      "from": params.from,
-      "size": params.size,
-      if (boolQuery.isNotEmpty) "query": {"bool": boolQuery},
-      if (params.sortFields.isNotEmpty)
-        "sort": params.sortFields
-            .map((sortField) => {
-                  sortField.field: {"order": sortField.order}
-                })
-            .toList(),
-    };
+    // Map<String, dynamic> query = {
+    //   "from": params.from,
+    //   "size": params.size,
+    //   if (boolQuery.isNotEmpty) "query": {"bool": boolQuery},
+    //   if (params.sortFields.isNotEmpty)
+    //     "sort": params.sortFields
+    //         .map((sortField) => {
+    //               sortField.field: {"order": sortField.order}
+    //             })
+    //         .toList(),
+    // };
 
-    return query;
+    return {};
   }
 
   static String buildUrlFromParams(Params params) {
@@ -150,11 +150,11 @@ class QueryHelper {
     }
 
     // Pagination for `@nestjsx/crud` (limit and page)
-    queryParams.add('limit=${params.size}');
-    if (params.from != null && params.size != null) {
-      int page = (params.from! ~/ params.size!) + 1;
-      queryParams.add('page=$page');
-    }
+    queryParams.add('limit=${params.limit}');
+    // if (params.from != null && params.size != null) {
+    //   int page = (params.from! ~/ params.size!) + 1;
+      queryParams.add('page=${params.page}');
+    // }
 
     // Construct the final query string
     String queryString = queryParams.join('&');

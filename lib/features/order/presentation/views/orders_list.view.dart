@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/views/injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
@@ -9,6 +11,7 @@ import 'package:nomo_app/features/order/data/repositories/order_impl.repository.
 import 'package:nomo_app/features/order/data/sources/order_impl.source.dart';
 import 'package:nomo_app/features/order/domain/order.usecase.dart';
 import 'package:nomo_app/features/order/presentation/cubits/order_list.cubit.dart';
+import 'package:nomo_app/features/order/presentation/views/order_list_shimmer.view.dart';
 import 'package:nomo_app/features/order/presentation/widgets/order_list_card.widget.dart';
 
 class OrdersListView extends StatelessWidget {
@@ -25,10 +28,13 @@ class OrdersListView extends StatelessWidget {
           orderModels: state.data,
         );
       },
+      loadingbuilder: (context, state) {
+        return OrderListShimmerView();
+      },
       listener: (context, state) => print(state),
       cubitBuilder: (BuildContext context) => OrderListCubit(
         context,
-        orderUsecase:  OrderUsecase(
+        orderUsecase: OrderUsecase(
             repository: OrderImplRepository(
                 dataSource:
                     OrderImplDataSource(httpService: ApiRestService()))),
@@ -70,25 +76,30 @@ class OrdersListViewContent extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        child: ListView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: orderModels?.length,
-          itemBuilder: (context, index) {
-            OrderModel? orderModel = orderModels?[index];
-            return Column(
-              children: [
-                if (index == 0)
-                  const SizedBox(
-                    height: kToolbarHeight +
-                        100, // Adjust height to compensate for the extended app bar
-                  ),
-                OrderListCardWidget(
-                  orderModel: orderModel,
-                ),
-              ],
-            );
-          },
-        ),
+        child: orderModels?.isNotEmpty ?? false
+            ? ListView.builder(
+              controller: context.read<OrderListCubit>().scrollController,
+                padding: EdgeInsets.zero,
+                itemCount: orderModels?.length,
+                itemBuilder: (context, index) {
+                  OrderModel? orderModel = orderModels?[index];
+                  return Column(
+                    children: [
+                      if (index == 0)
+                        const SizedBox(
+                          height: kToolbarHeight +
+                              100, // Adjust height to compensate for the extended app bar
+                        ),
+                      OrderListCardWidget(
+                        orderModel: orderModel,
+                      ),
+                    ],
+                  );
+                },
+              )
+            : Center(
+                child: CustomText("No Orders !!!").dm(),
+              ),
       ),
     );
   }

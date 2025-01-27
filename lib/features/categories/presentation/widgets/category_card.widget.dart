@@ -11,6 +11,7 @@ class CategoryCard extends StatelessWidget {
   final bool isSubCategory;
   final bool isSelected;
   final Function()? onTap;
+  final int? priority;
   const CategoryCard(
       {super.key,
       this.imgUrl,
@@ -18,6 +19,7 @@ class CategoryCard extends StatelessWidget {
       this.title,
       this.onTap,
       this.isSelected = false,
+      this.priority,
       this.isSubCategory = false});
 
   @override
@@ -62,11 +64,11 @@ class CategoryCard extends StatelessWidget {
               height: 4,
             ),
             if (isSubCategory)
-              CustomText(title ?? "").ds().center().fontSize(10.4)
+              CustomText("$title").ds().center().fontSize(10.4)
             else
               SizedBox(
                   width: 100,
-                  child: CustomText(title ?? "").ds().center().maxLines(2))
+                  child: CustomText("$title").ds().center().maxLines(2))
           ],
         ),
       ),

@@ -19,6 +19,7 @@ class SubCategoriesCubit extends BaseCubit<List<SubCategoryModel>?> {
 
   _fetchSubCategories() async {
     Params params = Params();
+    params.limit = 30;
     params.andFilters.add(Filter(field: "categoryId", values: [categoryId!]));
     params.andFilters.add(Filter(field: "enabled", values: ["true"]));
     final result = await subCategoriesUsecase.getSubCategories(params);
@@ -31,7 +32,7 @@ class SubCategoriesCubit extends BaseCubit<List<SubCategoryModel>?> {
     if (selectedSubcategory != null) {
       context!
           .read<ProductListCubit>()
-          .fetchProducts(selectedSubcategory!.id!.toString());
+          .fetchProducts(subCategoryId: selectedSubcategory!.id!.toString());
     }
   }
 
@@ -52,7 +53,7 @@ class SubCategoriesCubit extends BaseCubit<List<SubCategoryModel>?> {
     if (selectedSubcategory != null) {
       context!
           .read<ProductListCubit>()
-          .fetchProducts(selectedSubcategory!.id!.toString());
+          .fetchProducts(subCategoryId: selectedSubcategory!.id!.toString());
     }
   }
 

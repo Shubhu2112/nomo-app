@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nomo_app/core/presentation/views/injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_appbar.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/core/services/network_services/dio_http_impl.service.dart';
 import 'package:nomo_app/features/cart/presentation/widgets/go_to_cart_bottom_bar.widget.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
 import 'package:nomo_app/features/product/product_list/presentation/view/product_list.view.dart';
+import 'package:nomo_app/features/product/product_search/presentation/view/product_search.view.dart';
 import 'package:nomo_app/features/sub_categories/data/models/sub_categories.model.dart';
 import 'package:nomo_app/features/sub_categories/data/repositories/sub_categories_impl.repository.dart';
 import 'package:nomo_app/features/sub_categories/data/sources/sub_categories_impl.source.dart';
@@ -54,7 +57,19 @@ class SubCategoriesContent extends StatelessWidget {
     final cubit = context.read<SubCategoriesCubit>();
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(
+        onSearchPress: () {
+          NavigationService.goNext(context, ProductSearchView.routeName).then(
+            (value) async {
+              if (context.mounted) {
+                FocusScope.of(context).unfocus(); // Dismiss the keyboard
+                await SystemChannels.textInput.invokeMethod('TextInput.hide');
+                await SystemChannels.textInput.invokeMethod('TextInput.hide');
+              }
+            },
+          );
+        },
+      ),
       bottomNavigationBar: const GoToCartBottomWidget(),
       body: Row(
         children: [
@@ -91,7 +106,7 @@ class SubCategoriesContent extends StatelessWidget {
                                     "\n"), // Use the name from subCategoryModel
                                 // Pass the id if necessary
                                 isSubCategory: true, // Mark it as a subcategory
-
+                                priority: subCategoryModel?.priority,
                                 isSelected:
                                     subCategoryModel?.isSelected ?? false,
                                 onTap: () {

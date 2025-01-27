@@ -19,6 +19,7 @@ class OrderModel with _$OrderModel {
     @JsonKey(includeToJson: false) String? deliveryDateTime,
     @JsonKey(includeToJson: false) DeliveryDetailModel? deliveryDetail,
     List<CartItemModel>? orderItems,
+    @Default(false) isLoading
   }) = _OrderModel;
 
   factory OrderModel.fromJson(Map<String, dynamic> json) =>

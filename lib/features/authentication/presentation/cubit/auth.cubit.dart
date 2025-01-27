@@ -26,7 +26,7 @@ class AuthCubit extends BaseCubit<(UserModel?, bool?)> {
     contactNumber = contactNum;
     DialogBox.loadingDialog(
       context!,
-      Lottie.asset("groceries_loading".anm, fit: BoxFit.cover, height: 248),
+      Lottie.asset("groceries_loading".anm, fit: BoxFit.scaleDown, height: 100),
     );
     final result = await authUsecase.sendOtp(contactNum);
     isSentOtpSuccess = result;
@@ -37,7 +37,7 @@ class AuthCubit extends BaseCubit<(UserModel?, bool?)> {
   verifyOtp(String? otp) async {
     DialogBox.loadingDialog(
       context!,
-      Lottie.asset("groceries_loading".anm, fit: BoxFit.cover, height: 248),
+      Lottie.asset("groceries_loading".anm, fit: BoxFit.scaleDown, height: 100),
     );
     final result = await authUsecase.verifyOtp(contactNumber, otp);
     userModel = result?.data;
@@ -79,7 +79,7 @@ class AuthCubit extends BaseCubit<(UserModel?, bool?)> {
   updateName(String? name) async {
     DialogBox.loadingDialog(
       context!,
-      Lottie.asset("groceries_loading".anm, fit: BoxFit.cover, height: 248),
+      Lottie.asset("groceries_loading".anm, fit: BoxFit.scaleDown, height: 100),
     );
     final result = await authUsecase.updateName(contactNumber, name);
     userModel = result;

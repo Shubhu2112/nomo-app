@@ -85,7 +85,7 @@ class AuthImplDataSource implements AuthDataSource {
       response.message = apiResponse?.message;
       response.accessToken = apiResponse?.accessToken;
 
-      await CookieService.storeData(key: "token", value: response.accessToken);
+      await CookieService.storeData(key: 'token', value: response.accessToken);
     } catch (e) {
       rethrow;
     }

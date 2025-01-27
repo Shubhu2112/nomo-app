@@ -53,7 +53,7 @@ class ProductCartCard extends StatelessWidget {
                   ),
                 const SizedBox(width: 6),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 4),
                     child: Column(
@@ -75,7 +75,7 @@ class ProductCartCard extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Column(
               children: [
                 AddToCartButtonWidget(

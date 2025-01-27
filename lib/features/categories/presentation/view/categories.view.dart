@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nomo_app/core/data/extensions/assets.extensions.dart';
-import 'package:nomo_app/core/presentation/views/injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/views/non_injectable_base.view.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_appbar.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
+import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/features/categories/data/models/categories.model.dart';
 import 'package:nomo_app/features/categories/presentation/cubit/categories.cubit.dart';
+import 'package:nomo_app/features/categories/presentation/view/categories_shimmer.view.dart';
 import 'package:nomo_app/features/categories/presentation/widgets/category_card.widget.dart';
+import 'package:nomo_app/features/product/product_search/presentation/view/product_search.view.dart';
 
 class CategoriesView extends StatelessWidget {
   const CategoriesView({
@@ -18,6 +20,9 @@ class CategoriesView extends StatelessWidget {
   Widget build(BuildContext context) {
     return NonInjectableBaseView<CategoriesCubit, List<CategoryModel>?>(
       bottomSafeArea: false,
+      loadingbuilder: (context, state) {
+        return const CategoriesShimmerView();
+      },
       builder: (context, state) {
         return CategoriesContent(
           categories: state.data,
@@ -39,7 +44,19 @@ class CategoriesContent extends StatelessWidget {
     CategoriesCubit cubit = context.read<CategoriesCubit>();
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(
+        onSearchPress: () {
+          NavigationService.goNext(context, ProductSearchView.routeName).then(
+            (value) async {
+              if (context.mounted) {
+                FocusScope.of(context).unfocus(); // Dismiss the keyboard
+                await SystemChannels.textInput.invokeMethod('TextInput.hide');
+                await SystemChannels.textInput.invokeMethod('TextInput.hide');
+              }
+            },
+          );
+        },
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -63,102 +80,102 @@ class CategoriesContent extends StatelessWidget {
                       crossAxisCount: 4,
                       childAspectRatio: 0.66,
                     ),
-                    itemCount:  cubit.groceryCategories.length,
+                    itemCount: cubit.groceryCategories.length,
                     itemBuilder: (context, index) {
                       CategoryModel categoryModel =
                           cubit.groceryCategories[index];
                       return CategoryCard(
-                        imgUrl:categoryModel.image,
+                        imgUrl: categoryModel.image,
                         title: categoryModel.name,
                         id: categoryModel.id,
                       );
                     },
                   ),
                 ),
-                if(cubit.snacksCategories.isNotEmpty)
-              CustomText("Snacks & Drinks 😋").db().bold(),
-               if(cubit.snacksCategories.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: SizedBox(
-                  height: 416,
-                  child: GridView.builder(
-                    padding: EdgeInsets.zero,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.88,
+              if (cubit.snacksCategories.isNotEmpty)
+                CustomText("Snacks & Drinks 😋").db().bold(),
+              if (cubit.snacksCategories.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: SizedBox(
+                    height: 280,
+                    child: GridView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.88,
+                      ),
+                      itemCount: cubit.snacksCategories.length,
+                      itemBuilder: (context, index) {
+                        CategoryModel categoryModel =
+                            cubit.snacksCategories[index];
+                        return CategoryCard(
+                          imgUrl: categoryModel.image,
+                          title: categoryModel.name,
+                          id: categoryModel.id,
+                        );
+                      },
                     ),
-                    itemCount: cubit.snacksCategories.length,
-                    itemBuilder: (context, index) {
-                       CategoryModel categoryModel =
-                          cubit.snacksCategories[index];
-                      return CategoryCard(
-                        imgUrl: categoryModel.image,
-                        title: categoryModel.name,
-                         id: categoryModel.id,
-                      );
-                    },
                   ),
                 ),
-              ),
-               if(cubit.beautyCategories.isNotEmpty)
-              CustomText("Beauty & Personal Care 😋").db().bold(),
-               if(cubit.beautyCategories.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: SizedBox(
-                  height: 416,
-                  child: GridView.builder(
-                    padding: EdgeInsets.zero,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.88,
+              if (cubit.beautyCategories.isNotEmpty)
+                CustomText("Beauty & Personal Care 😋").db().bold(),
+              if (cubit.beautyCategories.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: SizedBox(
+                    height: 280,
+                    child: GridView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.88,
+                      ),
+                      itemCount: cubit.beautyCategories.length,
+                      itemBuilder: (context, index) {
+                        CategoryModel categoryModel =
+                            cubit.beautyCategories[index];
+                        return CategoryCard(
+                          imgUrl: categoryModel.image,
+                          title: categoryModel.name,
+                          id: categoryModel.id,
+                        );
+                      },
                     ),
-                    itemCount: cubit.beautyCategories.length,
-                    itemBuilder: (context, index) {
-                       CategoryModel categoryModel =
-                          cubit.beautyCategories[index];
-                      return CategoryCard(
-                        imgUrl: categoryModel.image,
-                        title: categoryModel.name,
-                         id: categoryModel.id,
-                      );
-                    },
                   ),
                 ),
-              ),
-                if(cubit.householdCategories.isNotEmpty)
-              CustomText("Household Essentials 😋").db().bold(),
-              if(cubit.householdCategories.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: SizedBox(
-                  height: 416,
-                  child: GridView.builder(
-                    padding: EdgeInsets.zero,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.88,
+              if (cubit.householdCategories.isNotEmpty)
+                CustomText("Household Essentials 😋").db().bold(),
+              if (cubit.householdCategories.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: SizedBox(
+                    height: 160,
+                    child: GridView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.88,
+                      ),
+                      itemCount: cubit.householdCategories.length,
+                      itemBuilder: (context, index) {
+                        CategoryModel categoryModel =
+                            cubit.householdCategories[index];
+                        return CategoryCard(
+                          imgUrl: categoryModel.image,
+                          title: categoryModel.name,
+                          id: categoryModel.id,
+                        );
+                      },
                     ),
-                    itemCount: cubit.householdCategories.length,
-                    itemBuilder: (context, index) {
-                      CategoryModel categoryModel =
-                          cubit.householdCategories[index];
-                      return CategoryCard(
-                        imgUrl: categoryModel.image,
-                        title: categoryModel.name,
-                         id: categoryModel.id,
-                      );
-                    },
                   ),
                 ),
-              ),
               const SizedBox(
                 height: kToolbarHeight + 20,
               )

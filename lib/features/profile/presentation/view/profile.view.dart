@@ -6,6 +6,7 @@ import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/services/bloc_services/bloc_manager.dart';
 import 'package:nomo_app/core/services/cookie_services/cookie.service.dart';
+import 'package:nomo_app/core/services/offline_db_services/hive.service.dart';
 import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
 import 'package:nomo_app/features/address/presentation/view/address_list.view.dart';
 import 'package:nomo_app/features/authentication/presentation/view/otp.view.dart';
@@ -116,11 +117,18 @@ class ProfileView extends StatelessWidget {
                         .textColor(Theme.of(context).colorScheme.surface)
                         .bold(),
                     onPress: () async {
-                      await CookieService.removeData("token");
+                      await CookieService.removeData('token');
 
                       if (context.mounted) {
                         context.read<CartCubit>().cartState?.cartItems = [];
+                        context.read<AddressListCubit>().selectedAddress = null;
+                        HiveService().clearCart();
+                        context.read<HomeCubit>().store = null;
+
+                        // getIt.unregister<HomeCubit>()
                       }
+                      await getIt.unregister<AddressListCubit>();
+                      // await getIt.unregister<HomeCubit>();
                       await getIt.unregister<CartCubit>();
                       await getIt.reset(dispose: true);
                       if (context.mounted) {
