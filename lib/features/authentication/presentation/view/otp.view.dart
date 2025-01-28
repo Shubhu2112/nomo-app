@@ -101,6 +101,7 @@ class OtpViewContent extends StatelessWidget {
                 CustomTextField(
                     hintText: "Phone Number",
                     focusNode: phoneNumberFocusNode,
+                    textInputType: const TextInputType.numberWithOptions(signed: true),
                     isRequired: true,
                     onPress: () {
                       _scrollController.animateTo(
