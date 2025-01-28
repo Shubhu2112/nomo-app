@@ -85,10 +85,10 @@ class _SplashViewState extends State<SplashView>
             dataSource: AuthImplDataSource(httpService: ApiRestService())));
     UserModel? user = await authUsecase.getUser();
 
-    // if (user?.fcmToken == null) {
+    if (user?.fcmToken == null) {
       String? fcmToken = await NotificationService.getToken();
       await authUsecase.updateFcmToken(fcmToken);
-    // }
+    }
 
     // Navigate to the next screen after a delay
     Future.delayed(Duration(seconds: user?.fcmToken != null ? 1 : 0), () {

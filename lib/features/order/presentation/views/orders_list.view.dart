@@ -29,7 +29,7 @@ class OrdersListView extends StatelessWidget {
         );
       },
       loadingbuilder: (context, state) {
-        return OrderListShimmerView();
+        return const OrderListShimmerView();
       },
       listener: (context, state) => print(state),
       cubitBuilder: (BuildContext context) => OrderListCubit(

@@ -46,9 +46,17 @@ class OrderListCardWidget extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              const Icon(
-                                Icons.check_box,
-                                size: 42,
+                              Padding(
+                                padding:  orderModel?.deliveryDetail?.deliveryStatus !=
+                                        "Delivered"? const EdgeInsets.all(6.0):EdgeInsets.zero,
+                                child: Icon(
+                                  orderModel?.deliveryDetail?.deliveryStatus !=
+                                          "Delivered"
+                                      ? Icons.pending
+                                      : Icons.check_box,
+                                  size:  orderModel?.deliveryDetail?.deliveryStatus !=
+                                          "Delivered"? 32: 42,
+                                ),
                               ),
                               const SizedBox(
                                 width: 8,

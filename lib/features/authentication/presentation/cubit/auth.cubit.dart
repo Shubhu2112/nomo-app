@@ -8,6 +8,7 @@ import 'package:nomo_app/core/presentation/base_cubits/base.cubit.dart';
 import 'package:nomo_app/core/presentation/base_cubits/base.state.dart';
 import 'package:nomo_app/core/presentation/dialogs/common_dialogs.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/core/services/notification_services/notification.service.dart';
 import 'package:nomo_app/features/authentication/data/models/user.model.dart';
 import 'package:nomo_app/features/authentication/domain/usecase/auth.usecase.dart';
 import 'package:nomo_app/features/authentication/presentation/widget/username_bottomsheet.widget.dart';
@@ -51,6 +52,10 @@ class AuthCubit extends BaseCubit<(UserModel?, bool?)> {
             await updateName(value);
             if (userModel != null) {
               if (context?.mounted ?? false) {
+                if (userModel?.fcmToken == null) {
+                  String? fcmToken = await NotificationService.getToken();
+                  await authUsecase.updateFcmToken(fcmToken);
+                }
                 NavigationService.popUntilAndPush(
                     context!, DashboardView.routeName,
                     arg: userModel);
@@ -61,6 +66,10 @@ class AuthCubit extends BaseCubit<(UserModel?, bool?)> {
       }
     } else if ((otpStatusCode ?? 404) == 200) {
       if (context?.mounted ?? false) {
+        if (userModel?.fcmToken == null) {
+          String? fcmToken = await NotificationService.getToken();
+          await authUsecase.updateFcmToken(fcmToken);
+        }
         NavigationService.popUntilAndPush(context!, DashboardView.routeName,
             arg: userModel);
       }
