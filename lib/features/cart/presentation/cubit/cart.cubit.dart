@@ -7,6 +7,8 @@ import 'package:nomo_app/core/presentation/base_cubits/base.state.dart';
 import 'package:nomo_app/core/presentation/views/dependency_injection/get_it_dependency_injection.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
 import 'package:nomo_app/core/services/offline_db_services/hive.service.dart';
+import 'package:nomo_app/core/services/payment_services/razorpay_service/models/razorpay_options.model.dart';
+import 'package:nomo_app/core/services/payment_services/razorpay_service/repositories/razorpay_impl.repository.dart';
 import 'package:nomo_app/features/cart/data/models/cart.model.dart';
 import 'package:nomo_app/features/cart/data/models/cart_item.model.dart';
 import 'package:nomo_app/features/cart/domain/cart.usecase.dart';
@@ -28,7 +30,7 @@ class CartCubit extends BaseCubit<CartState> {
 
   final CartUsecase cartUsecase;
   final OrderUsecase orderUsecase;
-
+  RazorpayRepositoryImpl? razorpayRepositoryImpl;
   CartState? cartState;
 
   // fetchProducts(String subCategoryId) async {
@@ -113,7 +115,8 @@ class CartCubit extends BaseCubit<CartState> {
       productOptionValueId: productOptionValue?.id,
       product: product,
       productOptionValue: productOptionValue,
-      maxRetailPrice: product?.maxRetailPrice ?? productOptionValue?.maxRetailPrice,
+      maxRetailPrice:
+          product?.maxRetailPrice ?? productOptionValue?.maxRetailPrice,
       // unit: product?.unit ?? optionName,
       // name: product?.name,
       // image: product?.image,
@@ -209,7 +212,7 @@ class CartCubit extends BaseCubit<CartState> {
     }
   }
 
-  placeOrder(int addressId) async {
+  placeOrder(int addressId, {Function()? handlePaymentError}) async {
     int storeId = getIt<HomeCubit>().store?.id ?? 0;
     OrderModel? orderModel = await orderUsecase.placeOrder(CartModel(
         storeId: storeId,
@@ -219,7 +222,28 @@ class CartCubit extends BaseCubit<CartState> {
     cartState?.cartItems = [];
     cartState?.orderModel = orderModel;
     if (orderModel != null) {
-      emit(OrderPlaceState(data: data));
+      if ((context?.mounted ?? false) && orderModel.id != null) {
+        razorpayRepositoryImpl = RazorpayRepositoryImpl(
+          context!,
+          handlePaymentSuccess: (response) {
+            emit(OrderPlaceState(data: data));
+          },
+          handleExternalWallet: (response) {},
+          handlePaymentError: (response) {
+            handlePaymentError?.call();
+            // print(response);
+            // if (context?.mounted ?? false) {
+            //   Navigator.pop(context!);
+            //   Navigator.pop(context!);
+            // }
+          },
+        );
+        RazorPayOptionsModel razorPayOptionsModel = RazorPayOptionsModel();
+        razorPayOptionsModel =
+            razorPayOptionsModel.copyWith(orderId: orderModel.razorpayOrderId);
+
+        razorpayRepositoryImpl?.openCheckout(razorPayOptionsModel);
+      }
     }
   }
 

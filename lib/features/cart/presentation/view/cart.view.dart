@@ -9,6 +9,7 @@ import 'package:nomo_app/core/presentation/widgets/common/custom_button.dart';
 import 'package:nomo_app/core/presentation/widgets/common/custom_text.dart';
 import 'package:nomo_app/core/presentation/widgets/common/shared_ui.dart';
 import 'package:nomo_app/core/services/navigation_services/navigation_service.dart';
+import 'package:nomo_app/core/services/payment_services/razorpay_service/repositories/razorpay_impl.repository.dart';
 import 'package:nomo_app/features/address/data/models/address.model.dart';
 import 'package:nomo_app/features/address/presentation/cubit/address_list.cubit.dart';
 import 'package:nomo_app/features/address/presentation/view/add_address.view.dart';
@@ -114,9 +115,12 @@ class CartContent extends StatelessWidget {
                 Lottie.asset("groceries_loading".anm,
                     fit: BoxFit.scaleDown, height: 100),
               );
-              context
-                  .read<CartCubit>()
-                  .placeOrder(selectedAddressModel.id ?? 0);
+              context.read<CartCubit>().placeOrder(
+                selectedAddressModel.id ?? 0,
+                handlePaymentError: () {
+                  Navigator.pop(context);
+                },
+              );
             }
           },
         ),
@@ -179,7 +183,9 @@ class CartContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-               GradientSavingCard(totalSavings: cartAmount.totalSavings,),
+              GradientSavingCard(
+                totalSavings: cartAmount.totalSavings,
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: CustomText("Review items").db().bold(),

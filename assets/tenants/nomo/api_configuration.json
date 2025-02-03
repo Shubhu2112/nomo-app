@@ -15,7 +15,7 @@
     "mfApiBaseUrl": "https://uat-publicsvc.heytorus.com/mutualfund/api",
     "authApiBaseUrl": "https://uat-publicsvc.heytorus.com/users/api",
     "esApiBaseUrl": "https://elastic:oE4QEqoZtjSpZX07IHmBiepy@eb9edd9570f44fe79a3d1f9bbab4193e.us-central1.gcp.cloud.es.io",
-    "razorpayKey": "",
+    "razorpayKey": "rzp_live_69NaxzTYnqLKHd",
     "bankDebitCardKey": "89555EED0B07495D00A6C11789D40E1D"
   },
   "PROD": {

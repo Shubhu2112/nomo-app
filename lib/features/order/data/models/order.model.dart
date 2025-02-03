@@ -10,6 +10,7 @@ part 'order.model.g.dart';
 class OrderModel with _$OrderModel {
   factory OrderModel({
     @JsonKey(includeToJson: false) int? id,
+    @JsonKey(includeToJson: false) String? razorpayOrderId,
     AddressModel? address,
     @JsonKey(includeToJson: false) double? totalAmount,
     @JsonKey(includeToJson: false) double? totalMRP,
