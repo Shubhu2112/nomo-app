@@ -173,163 +173,168 @@ class CartContent extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-               GradientSavingCard(totalSavings: cartAmount.totalSavings,),
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: CustomText("Review items").db().bold(),
-              ),
-              Card(
-                color: const Color(0xffF4E2E4),
-                elevation: 6,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      // Row for Delivery and item count
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomText("Delivery in 8 Mins")
-                                .db()
-                                .textColor(Colors.green),
-                            Row(
-                              children: [
-                                Image.asset("grocery_delivery".png),
-                                CustomText(
-                                        "${cartState?.cartItems.length} items")
-                                    .lm(),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // ListView or equivalent for product cards
-                      ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap:
-                            true, // Allows ListView to shrink to the height of its content
-                        physics:
-                            const NeverScrollableScrollPhysics(), // Prevents it from scrolling separately
-                        itemCount:
-                            cartState?.cartItems.length, // Number of items
-                        itemBuilder: (context, index) {
-                          CartItemModel? cartItemModel =
-                              cartState?.cartItems[index];
-
-                          if (cartItemModel?.productOptionValueId == null) {
-                            return ProductCartCard(
-                              productModel: cartItemModel?.product,
-                              // productModel: ProductModel(
-                              //     id: cartItemModel?.productId,
-                              //     maxRetailPrice: cartItemModel?.maxRetailPrice,
-                              //     sellingPrice: cartItemModel?.price,
-                              //     image: cartItemModel?.image,
-                              //     name: cartItemModel?.name,
-                              //     unit: cartItemModel?.unit),
-                            );
-                          } else {
-                            return ProductOptionCartCard(
-                              productModel: cartItemModel?.product,
-                              productOptionValueModel:
-                                  cartItemModel?.productOptionValue,
-                              // productModel: ProductModel(
-                              //     id: cartItemModel?.productId,
-                              //     maxRetailPrice: cartItemModel?.maxRetailPrice,
-                              //     sellingPrice: cartItemModel?.price,
-                              //     image: cartItemModel?.image,
-                              //     name: cartItemModel?.name,
-                              //     unit: cartItemModel?.unit),
-                              // productOptionValueModel: ProductOptionValueModel(
-                              //     id: cartItemModel?.productOptionValueId,
-                              //     maxRetailPrice: cartItemModel?.maxRetailPrice,
-                              //     sellingPrice: cartItemModel?.price,
-                              //     productsId: cartItemModel?.productId,
-                              //     image: cartItemModel?.image,
-                              //     name: cartItemModel?.name,
-                              //     unit: cartItemModel?.unit),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
+      body: RefreshIndicator.adaptive(
+        onRefresh: () async {
+          context.read<CartCubit>().refreshData();
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                 GradientSavingCard(totalSavings: cartAmount.totalSavings,),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: CustomText("Review items").db().bold(),
                 ),
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              InkWell(
-                onTap: () {
-                  NavigationService.goNextFinishAll(
-                      context, DashboardView.routeName);
-                  // if (NavigationService.canGoBack()) {
-                  //   NavigationService.goBack(context);
-                  // }
-                },
-                child: Card(
+                Card(
+                  color: const Color(0xffF4E2E4),
                   elevation: 6,
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
                       children: [
-                        CustomText("Missed Something? ").ds().bold(),
-                        CustomText("Add More items")
-                            .ds()
-                            .textColor(Theme.of(context).primaryColor)
-                            .bold()
+                        // Row for Delivery and item count
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CustomText("Delivery in 8 Mins")
+                                  .db()
+                                  .textColor(Colors.green),
+                              Row(
+                                children: [
+                                  Image.asset("grocery_delivery".png),
+                                  CustomText(
+                                          "${cartState?.cartItems.length} items")
+                                      .lm(),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+        
+                        // ListView or equivalent for product cards
+                        ListView.builder(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap:
+                              true, // Allows ListView to shrink to the height of its content
+                          physics:
+                              const NeverScrollableScrollPhysics(), // Prevents it from scrolling separately
+                          itemCount:
+                              cartState?.cartItems.length, // Number of items
+                          itemBuilder: (context, index) {
+                            CartItemModel? cartItemModel =
+                                cartState?.cartItems[index];
+        
+                            if (cartItemModel?.productOptionValueId == null) {
+                              return ProductCartCard(
+                                productModel: cartItemModel?.product,
+                                // productModel: ProductModel(
+                                //     id: cartItemModel?.productId,
+                                //     maxRetailPrice: cartItemModel?.maxRetailPrice,
+                                //     sellingPrice: cartItemModel?.price,
+                                //     image: cartItemModel?.image,
+                                //     name: cartItemModel?.name,
+                                //     unit: cartItemModel?.unit),
+                              );
+                            } else {
+                              return ProductOptionCartCard(
+                                productModel: cartItemModel?.product,
+                                productOptionValueModel:
+                                    cartItemModel?.productOptionValue,
+                                // productModel: ProductModel(
+                                //     id: cartItemModel?.productId,
+                                //     maxRetailPrice: cartItemModel?.maxRetailPrice,
+                                //     sellingPrice: cartItemModel?.price,
+                                //     image: cartItemModel?.image,
+                                //     name: cartItemModel?.name,
+                                //     unit: cartItemModel?.unit),
+                                // productOptionValueModel: ProductOptionValueModel(
+                                //     id: cartItemModel?.productOptionValueId,
+                                //     maxRetailPrice: cartItemModel?.maxRetailPrice,
+                                //     sellingPrice: cartItemModel?.price,
+                                //     productsId: cartItemModel?.productId,
+                                //     image: cartItemModel?.image,
+                                //     name: cartItemModel?.name,
+                                //     unit: cartItemModel?.unit),
+                              );
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              BillSummaryCardWidget(
-                maxRetailPriceTotal: cartAmount.maxRetailPriceTotal,
-                totalSavings: cartAmount.totalSavings,
-                total: cartAmount.priceTotal,
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: CustomText("Review your order to avoid cancellations")
-                    .dm()
-                    .bold(),
-              ),
-              Card(
-                elevation: 6,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                              "NOTE: Orders cannot be canceled and are non-refundable once packed for delivery.")
-                          .ds(),
-                      CustomText("Read Cancellation Policy")
-                          .ds()
-                          .textColor(Theme.of(context).primaryColor)
-                          .decoration(TextDecoration.underline)
-                    ],
+                const SizedBox(
+                  height: 6,
+                ),
+                InkWell(
+                  onTap: () {
+                    NavigationService.goNextFinishAll(
+                        context, DashboardView.routeName);
+                    // if (NavigationService.canGoBack()) {
+                    //   NavigationService.goBack(context);
+                    // }
+                  },
+                  child: Card(
+                    elevation: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomText("Missed Something? ").ds().bold(),
+                          CustomText("Add More items")
+                              .ds()
+                              .textColor(Theme.of(context).primaryColor)
+                              .bold()
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                  height: kToolbarHeight - 50), // Add space at the bottom
-            ],
+                const SizedBox(
+                  height: 6,
+                ),
+                BillSummaryCardWidget(
+                  maxRetailPriceTotal: cartAmount.maxRetailPriceTotal,
+                  totalSavings: cartAmount.totalSavings,
+                  total: cartAmount.priceTotal,
+                ),
+                const SizedBox(
+                  height: 6,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: CustomText("Review your order to avoid cancellations")
+                      .dm()
+                      .bold(),
+                ),
+                Card(
+                  elevation: 6,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                                "NOTE: Orders cannot be canceled and are non-refundable once packed for delivery.")
+                            .ds(),
+                        CustomText("Read Cancellation Policy")
+                            .ds()
+                            .textColor(Theme.of(context).primaryColor)
+                            .decoration(TextDecoration.underline)
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                    height: kToolbarHeight - 50), // Add space at the bottom
+              ],
+            ),
           ),
         ),
       ),

@@ -63,186 +63,191 @@ class HomeViewContent extends StatelessWidget {
   final TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: CustomScrollView(
-        controller: context.read<HomeCubit>().scrollController,
-        slivers: [
-          // SliverAppBar with a Custom Search Bar and Header
-          SliverAppBar(
-            backgroundColor:
-                Theme.of(context).colorScheme.secondary.withOpacity(0.09),
-            floating: true,
-            pinned: false,
-            snap: false,
-            expandedHeight: 130.0,
-            flexibleSpace: FlexibleSpaceBar(
-              background: SafeArea(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomText(
-                                      "Delivery in just ${store?.travelTimeInMins} Mins")
-                                  .db()
-                                  .bold(),
-                              InkWell(
-                                onTap: () {
-                                  NavigationService.goNext(
-                                      context, AddressListView.routeName);
-                                },
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_pin,
-                                    ),
-                                    CustomText(" ${store?.address}").ds(),
-                                    Icon(
-                                      Icons.keyboard_arrow_down,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                      size: 20,
-                                    ),
-                                  ],
+    return RefreshIndicator.adaptive(
+      onRefresh: () async {
+        context.read<HomeCubit>().refreshData();
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: CustomScrollView(
+          controller: context.read<HomeCubit>().scrollController,
+          slivers: [
+            // SliverAppBar with a Custom Search Bar and Header
+            SliverAppBar(
+              backgroundColor:
+                  Theme.of(context).colorScheme.secondary.withOpacity(0.09),
+              floating: true,
+              pinned: false,
+              snap: false,
+              expandedHeight: 130.0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomText(
+                                        "Delivery in just ${store?.travelTimeInMins} Mins")
+                                    .db()
+                                    .bold(),
+                                InkWell(
+                                  onTap: () {
+                                    NavigationService.goNext(
+                                        context, AddressListView.routeName);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.location_pin,
+                                      ),
+                                      CustomText(" ${store?.address}").ds(),
+                                      Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                        size: 20,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          InkWell(
-                            onTap: () {
-                              onProfileTap?.call();
-                            },
-                            child: const CircleAvatar(
-                              child: Icon(Icons.person),
+                              ],
                             ),
-                          )
-                        ],
+                            InkWell(
+                              onTap: () {
+                                onProfileTap?.call();
+                              },
+                              child: const CircleAvatar(
+                                child: Icon(Icons.person),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: CustomSearchBar(
-                        onPress: () {
-                          NavigationService.goNext(
-                            context,
-                            ProductSearchView.routeName,
-                          ).then((value) async {
-                            if (context.mounted) {
-                                FocusScope.of(context)
-                                  .unfocus(); // Dismiss the keyboard
-                            await  SystemChannels.textInput
-                                  .invokeMethod('TextInput.hide');
-                             await SystemChannels.textInput
-                                  .invokeMethod('TextInput.hide');
-                            
-                            }
-                          });
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        child: CustomSearchBar(
+                          onPress: () {
+                            NavigationService.goNext(
+                              context,
+                              ProductSearchView.routeName,
+                            ).then((value) async {
+                              if (context.mounted) {
+                                  FocusScope.of(context)
+                                    .unfocus(); // Dismiss the keyboard
+                              await  SystemChannels.textInput
+                                    .invokeMethod('TextInput.hide');
+                               await SystemChannels.textInput
+                                    .invokeMethod('TextInput.hide');
+                              
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            //TODO: add carousel
+      
+            // Sliver for the carousel
+            // SliverToBoxAdapter(
+            //   child: Padding(
+            //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            //     child: CustomCarousel(
+            //       items: [
+            //         Image.asset("carousel_1".png),
+            //         Image.asset("carousel_2".png),
+            //         Image.asset("carousel_2".png),
+            //       ],
+            //       aspectRatio: 2.1,
+            //     ),
+            //   ),
+            // ),
+      
+            // Sliver for the Categories section
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomText("Categories 😋").db().bold(),
+                    TextButton(
+                        onPressed: () {
+                          onCategoriesTap?.call();
                         },
-                      ),
-                    ),
+                        child: CustomText("See all").db()),
                   ],
                 ),
               ),
             ),
-          ),
-          //TODO: add carousel
-
-          // Sliver for the carousel
-          // SliverToBoxAdapter(
-          //   child: Padding(
-          //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          //     child: CustomCarousel(
-          //       items: [
-          //         Image.asset("carousel_1".png),
-          //         Image.asset("carousel_2".png),
-          //         Image.asset("carousel_2".png),
-          //       ],
-          //       aspectRatio: 2.1,
-          //     ),
-          //   ),
-          // ),
-
-          // Sliver for the Categories section
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            sliver: SliverToBoxAdapter(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomText("Categories 😋").db().bold(),
-                  TextButton(
-                      onPressed: () {
-                        onCategoriesTap?.call();
-                      },
-                      child: CustomText("See all").db()),
-                ],
+      
+            // Sliver for the horizontal list of categories
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 130,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    CategoryModel? category = categories?[index];
+                    return CategoryCard(
+                      imgUrl: category?.image,
+                      title: category?.name,
+                      id: category?.id,
+                    );
+                  },
+                  itemCount: categories?.length,
+                ),
               ),
             ),
-          ),
-
-          // Sliver for the horizontal list of categories
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 130,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
+      
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomText("Best Selling 🔥").db().bold(),
+                    // TODO : need to add more functionality
+                    // TextButton(
+                    //     onPressed: () {}, child: CustomText("See all").db()),
+                  ],
+                ),
+              ),
+            ),
+      
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              sliver: SliverGrid.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 0.8),
+                itemCount: bestSellingProducts?.length,
                 itemBuilder: (context, index) {
-                  CategoryModel? category = categories?[index];
-                  return CategoryCard(
-                    imgUrl: category?.image,
-                    title: category?.name,
-                    id: category?.id,
+                  ProductModel? product = bestSellingProducts?[index];
+                  return ProductCard(
+                    isSubCategory: false,
+                    productModel: product,
                   );
                 },
-                itemCount: categories?.length,
               ),
             ),
-          ),
-
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            sliver: SliverToBoxAdapter(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomText("Best Selling 🔥").db().bold(),
-                  // TODO : need to add more functionality
-                  // TextButton(
-                  //     onPressed: () {}, child: CustomText("See all").db()),
-                ],
-              ),
+      
+            const SliverPadding(
+              padding: EdgeInsets.symmetric(vertical: kToolbarHeight - 10),
             ),
-          ),
-
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            sliver: SliverGrid.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, childAspectRatio: 0.8),
-              itemCount: bestSellingProducts?.length,
-              itemBuilder: (context, index) {
-                ProductModel? product = bestSellingProducts?[index];
-                return ProductCard(
-                  isSubCategory: false,
-                  productModel: product,
-                );
-              },
-            ),
-          ),
-
-          const SliverPadding(
-            padding: EdgeInsets.symmetric(vertical: kToolbarHeight - 10),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

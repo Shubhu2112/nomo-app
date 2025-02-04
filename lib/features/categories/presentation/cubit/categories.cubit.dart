@@ -52,6 +52,14 @@ class CategoriesCubit extends BaseCubit<List<CategoryModel>> {
     emit(BaseCompletedState(data: data));
   }
 
+  void refreshData() {
+    groceryCategories = [];
+    snacksCategories = [];
+    beautyCategories = [];
+    householdCategories = [];
+    _fetchCategories();
+  }
+
   @override
   List<CategoryModel>? get data => _categories;
 

@@ -52,19 +52,24 @@ class ProductListContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 6, left: 1),
-      child: GridView.builder(
-        controller: context.read<ProductListCubit>().scrollController,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, childAspectRatio: 0.64),
-        itemCount: productList?.length,
-        itemBuilder: (context, index) {
-          ProductModel? product = productList?[index];
-          return ProductCard(
-            productModel: product,
-          );
-        },
+    return RefreshIndicator.adaptive(
+      onRefresh: () async {
+        return context.read<ProductListCubit>().refreshData();
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 6, left: 1),
+        child: GridView.builder(
+          controller: context.read<ProductListCubit>().scrollController,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, childAspectRatio: 0.64),
+          itemCount: productList?.length,
+          itemBuilder: (context, index) {
+            ProductModel? product = productList?[index];
+            return ProductCard(
+              productModel: product,
+            );
+          },
+        ),
       ),
     );
   }

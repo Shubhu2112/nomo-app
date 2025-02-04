@@ -109,6 +109,11 @@ class HomeCubit extends BaseCubit<
     }
   }
 
+  void refreshData() {
+    _fetchCategories();
+    _fetchBestSellingProducts();
+  }
+
   @override
   (List<CategoryModel>?, List<ProductModel>?, StoreModel?)? get data =>
       (_categories, _bestSellingProducts, store);
@@ -119,7 +124,7 @@ class HomeCubit extends BaseCubit<
       emit(const BaseLoadingState());
       isLoading = true;
     }
- scrollController.addListener(() async {
+    scrollController.addListener(() async {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
         // if (!isLoading) {

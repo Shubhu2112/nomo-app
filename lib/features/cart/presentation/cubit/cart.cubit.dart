@@ -223,6 +223,10 @@ class CartCubit extends BaseCubit<CartState> {
     }
   }
 
+  void refreshData() {
+    CartState(HiveService().getAllCartItems(), null);
+  }
+
   @override
   FutureOr<void> init() async {
     if (state is! BaseLoadingState) emit(const BaseLoadingState());

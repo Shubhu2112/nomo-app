@@ -20,7 +20,8 @@ class ProductListCubit extends BaseCubit<List<ProductModel>?> {
   String? subCategory;
   ScrollController scrollController = ScrollController();
 
-  Future<void> fetchProducts({String? subCategoryId, bool isInit = true}) async {
+  Future<void> fetchProducts(
+      {String? subCategoryId, bool isInit = true}) async {
     if (isInit) {
       _initializeFetch(subCategoryId);
     } else {
@@ -61,6 +62,10 @@ class ProductListCubit extends BaseCubit<List<ProductModel>?> {
 
   void _removeShimmerLoading() {
     products?.removeWhere((product) => product.isLoading);
+  }
+
+  void refreshData() {
+    fetchProducts(subCategoryId: subCategory,isInit: true);
   }
 
   @override
