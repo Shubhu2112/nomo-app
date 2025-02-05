@@ -57,7 +57,12 @@ class CategoriesCubit extends BaseCubit<List<CategoryModel>> {
     snacksCategories = [];
     beautyCategories = [];
     householdCategories = [];
-    _fetchCategories();
+    if (groceryCategories.isEmpty &&
+        snacksCategories.isEmpty &&
+        beautyCategories.isEmpty &&
+        householdCategories.isEmpty) {
+      _fetchCategories();
+    }
   }
 
   @override

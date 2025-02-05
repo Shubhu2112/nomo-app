@@ -33,18 +33,20 @@ class CategoriesView extends StatelessWidget {
   }
 }
 
-class CategoriesContent extends StatelessWidget {
+class CategoriesContent extends StatelessWidget  with WidgetsBindingObserver {
   final List<CategoryModel>? categories;
   CategoriesContent({super.key, this.categories});
 
   final TextEditingController searchController = TextEditingController();
+  CategoriesCubit? _cubit;
 
   @override
   Widget build(BuildContext context) {
-    CategoriesCubit cubit = context.read<CategoriesCubit>();
+    WidgetsBinding.instance.addObserver(this);
+    _cubit = context.read<CategoriesCubit>();
     return RefreshIndicator.adaptive(
       onRefresh: () async {
-        cubit.refreshData();
+        _cubit?.refreshData();
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
@@ -71,9 +73,9 @@ class CategoriesContent extends StatelessWidget {
                   height: kToolbarHeight +
                       110, // Adjust height to compensate for the extended app bar
                 ),
-                if (cubit.groceryCategories.isNotEmpty)
+                if (_cubit!.groceryCategories.isNotEmpty)
                   CustomText("Grocery & Kitchen 😋").db().bold(),
-                if (cubit.groceryCategories.isNotEmpty)
+                if (_cubit!.groceryCategories.isNotEmpty)
                   SizedBox(
                     height: 280,
                     child: GridView.builder(
@@ -84,10 +86,10 @@ class CategoriesContent extends StatelessWidget {
                         crossAxisCount: 4,
                         childAspectRatio: 0.66,
                       ),
-                      itemCount: cubit.groceryCategories.length,
+                      itemCount: _cubit?.groceryCategories.length,
                       itemBuilder: (context, index) {
                         CategoryModel categoryModel =
-                            cubit.groceryCategories[index];
+                            _cubit!.groceryCategories[index];
                         return CategoryCard(
                           imgUrl: categoryModel.image,
                           title: categoryModel.name,
@@ -96,9 +98,9 @@ class CategoriesContent extends StatelessWidget {
                       },
                     ),
                   ),
-                if (cubit.snacksCategories.isNotEmpty)
+                if (_cubit!.snacksCategories.isNotEmpty)
                   CustomText("Snacks & Drinks 😋").db().bold(),
-                if (cubit.snacksCategories.isNotEmpty)
+                if (_cubit!.snacksCategories.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: SizedBox(
@@ -111,10 +113,10 @@ class CategoriesContent extends StatelessWidget {
                           crossAxisCount: 3,
                           childAspectRatio: 0.88,
                         ),
-                        itemCount: cubit.snacksCategories.length,
+                        itemCount: _cubit?.snacksCategories.length,
                         itemBuilder: (context, index) {
                           CategoryModel categoryModel =
-                              cubit.snacksCategories[index];
+                              _cubit!.snacksCategories[index];
                           return CategoryCard(
                             imgUrl: categoryModel.image,
                             title: categoryModel.name,
@@ -124,9 +126,9 @@ class CategoriesContent extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (cubit.beautyCategories.isNotEmpty)
+                if (_cubit!.beautyCategories.isNotEmpty)
                   CustomText("Beauty & Personal Care 😋").db().bold(),
-                if (cubit.beautyCategories.isNotEmpty)
+                if (_cubit!.beautyCategories.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: SizedBox(
@@ -139,10 +141,10 @@ class CategoriesContent extends StatelessWidget {
                           crossAxisCount: 3,
                           childAspectRatio: 0.88,
                         ),
-                        itemCount: cubit.beautyCategories.length,
+                        itemCount: _cubit?.beautyCategories.length,
                         itemBuilder: (context, index) {
                           CategoryModel categoryModel =
-                              cubit.beautyCategories[index];
+                              _cubit!.beautyCategories[index];
                           return CategoryCard(
                             imgUrl: categoryModel.image,
                             title: categoryModel.name,
@@ -152,9 +154,9 @@ class CategoriesContent extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (cubit.householdCategories.isNotEmpty)
+                if (_cubit!.householdCategories.isNotEmpty)
                   CustomText("Household Essentials 😋").db().bold(),
-                if (cubit.householdCategories.isNotEmpty)
+                if (_cubit!.householdCategories.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: SizedBox(
@@ -167,10 +169,10 @@ class CategoriesContent extends StatelessWidget {
                           crossAxisCount: 3,
                           childAspectRatio: 0.88,
                         ),
-                        itemCount: cubit.householdCategories.length,
+                        itemCount:_cubit?.householdCategories.length,
                         itemBuilder: (context, index) {
                           CategoryModel categoryModel =
-                              cubit.householdCategories[index];
+                              _cubit!.householdCategories[index];
                           return CategoryCard(
                             imgUrl: categoryModel.image,
                             title: categoryModel.name,
@@ -189,6 +191,15 @@ class CategoriesContent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+       _cubit?.refreshData();
+    }
   }
 }
 

@@ -47,7 +47,7 @@ class HomeView extends StatelessWidget {
   }
 }
 
-class HomeViewContent extends StatelessWidget {
+class HomeViewContent extends StatelessWidget with WidgetsBindingObserver {
   final Function()? onProfileTap;
   final Function()? onCategoriesTap;
   final List<CategoryModel>? categories;
@@ -61,11 +61,15 @@ class HomeViewContent extends StatelessWidget {
       this.bestSellingProducts,
       this.store});
   final TextEditingController searchController = TextEditingController();
+  HomeCubit? _cubit;
+  
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addObserver(this);
+    _cubit = context.read<HomeCubit>();
     return RefreshIndicator.adaptive(
       onRefresh: () async {
-        context.read<HomeCubit>().refreshData();
+        _cubit?.refreshData();
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -250,5 +254,14 @@ class HomeViewContent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+       _cubit?.refreshData();
+    }
   }
 }

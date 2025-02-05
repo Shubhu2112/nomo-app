@@ -77,15 +77,18 @@ class CartView extends StatelessWidget {
   }
 }
 
-class CartContent extends StatelessWidget {
+class CartContent extends StatelessWidget with WidgetsBindingObserver {
   static String routeName = "/cart_view";
 
   final CartState? cartState;
+  CartCubit? _cubit;
 
-  const CartContent({super.key, this.cartState});
+  CartContent({super.key, this.cartState});
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addObserver(this);
+    _cubit = context.read<CartCubit>();
     ({
       double maxRetailPriceTotal,
       double priceTotal,
@@ -175,7 +178,7 @@ class CartContent extends StatelessWidget {
       ),
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
-          context.read<CartCubit>().refreshData();
+          _cubit?.refreshData();
         },
         child: SingleChildScrollView(
           child: Padding(
@@ -183,7 +186,9 @@ class CartContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                 GradientSavingCard(totalSavings: cartAmount.totalSavings,),
+                GradientSavingCard(
+                  totalSavings: cartAmount.totalSavings,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
                   child: CustomText("Review items").db().bold(),
@@ -215,7 +220,7 @@ class CartContent extends StatelessWidget {
                             ],
                           ),
                         ),
-        
+
                         // ListView or equivalent for product cards
                         ListView.builder(
                           padding: EdgeInsets.zero,
@@ -228,7 +233,7 @@ class CartContent extends StatelessWidget {
                           itemBuilder: (context, index) {
                             CartItemModel? cartItemModel =
                                 cartState?.cartItems[index];
-        
+
                             if (cartItemModel?.productOptionValueId == null) {
                               return ProductCartCard(
                                 productModel: cartItemModel?.product,
@@ -339,5 +344,14 @@ class CartContent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      _cubit?.refreshData();
+    }
   }
 }

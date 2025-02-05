@@ -46,15 +46,19 @@ class ProductListView extends StatelessWidget {
   }
 }
 
-class ProductListContent extends StatelessWidget {
+class ProductListContent extends StatelessWidget with WidgetsBindingObserver {
   final List<ProductModel>? productList;
-  const ProductListContent({super.key, this.productList});
+  ProductListContent({super.key, this.productList});
+
+  ProductListCubit? _productListCubit;
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addObserver(this);
+    _productListCubit = context.read<ProductListCubit>();
     return RefreshIndicator.adaptive(
       onRefresh: () async {
-        return context.read<ProductListCubit>().refreshData();
+        _productListCubit?.refreshData();
       },
       child: Padding(
         padding: const EdgeInsets.only(right: 6, left: 1),
@@ -72,5 +76,14 @@ class ProductListContent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      _productListCubit?.refreshData();
+    }
   }
 }
